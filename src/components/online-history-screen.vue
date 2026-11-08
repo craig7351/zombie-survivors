@@ -1,16 +1,16 @@
 <template>
-  <div class="absolute inset-0 overflow-auto text-white">
+  <div class="absolute inset-0 overflow-auto text-text-primary">
     <background-polygons />
 
     <div class="relative mx-auto flex max-w-2xl flex-col gap-4 p-6">
       <div class="flex items-center gap-3 pt-4">
         <button
-          class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
+          class="rounded-lg bg-surface-2 px-4 py-2 font-medium transition hover:bg-surface-3 active:scale-95"
           @click="emit('back')"
         >
           <game-icon name="back" :size="16" />返回
         </button>
-        <h1 class="flex items-center gap-2 text-xl font-medium text-text-primary">
+        <h1 class="flex items-center gap-2 text-lg font-medium text-text-primary">
           <game-icon name="chart" :size="20" />線上人數
         </h1>
       </div>
@@ -20,22 +20,22 @@
         <button
           v-for="r in ranges"
           :key="r.id"
-          class="flex-1 rounded-full px-3 py-2 text-sm font-black backdrop-blur-md transition active:scale-95"
-          :class="range === r.id ? 'bg-lime-400 text-black' : 'bg-black/40 text-white/70 hover:bg-black/60'"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium transition active:scale-95"
+          :class="range === r.id ? 'bg-accent text-void' : 'bg-surface-1 text-text-secondary hover:bg-surface-3'"
           @click="selectRange(r.id)"
         >
           {{ r.label }}
         </button>
       </div>
 
-      <div class="rounded-2xl bg-black/40 p-4 backdrop-blur-md ring-1 ring-white/10">
+      <div class="rounded-2xl bg-surface-1 p-4 border border-hairline">
         <div class="mb-2 flex items-baseline justify-between">
-          <span class="text-sm text-white/60">每小時最高同時在線</span>
-          <span class="text-sm font-black text-lime-300">區間尖峰 {{ maxPeak }} 人</span>
+          <span class="text-sm text-text-secondary">每小時最高同時在線</span>
+          <span class="text-sm font-medium text-accent">區間尖峰 {{ maxPeak }} 人</span>
         </div>
 
-        <div v-if="loading" class="py-16 text-center text-white/50">載入中…</div>
-        <div v-else-if="!hasData" class="py-16 text-center text-white/55">
+        <div v-if="loading" class="py-16 text-center text-text-muted">載入中…</div>
+        <div v-else-if="!hasData" class="py-16 text-center text-text-muted">
           資料剛開始累積，過幾天再回來看趨勢～
         </div>
         <svg v-else viewBox="0 0 720 260" class="w-full" preserveAspectRatio="none" style="height: 260px">
@@ -52,7 +52,7 @@
             :y="b.y"
             :width="b.w"
             :height="b.h"
-            :fill="b.peak > 0 ? '#a3e635' : 'transparent'"
+            :fill="b.peak > 0 ? 'var(--color-accent)' : 'transparent'"
             rx="0.5"
           />
           <!-- X 軸標籤 -->
@@ -70,7 +70,7 @@
         </svg>
       </div>
 
-      <p class="text-center text-xs text-white/35">時間為當地時區・縱軸為人數・每根 = 1 小時內最高同時在線</p>
+      <p class="text-center text-xs text-text-muted">時間為當地時區・縱軸為人數・每根 = 1 小時內最高同時在線</p>
     </div>
   </div>
 </template>

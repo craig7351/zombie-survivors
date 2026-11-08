@@ -96,7 +96,7 @@ body {
   border: 1px solid rgba(236, 239, 230, 0.09);
 }
 
-/* 面板：表面階梯 + 髮絲線（不用 backdrop-blur，不用彩色陰影） */
+/* 面板：表面階梯 + 髮絲線（不套用毛玻璃濾鏡，不用彩色陰影） */
 .panel {
   background: var(--color-surface-1);
   border: 1px solid rgba(236, 239, 230, 0.09);

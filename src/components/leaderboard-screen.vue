@@ -1,21 +1,21 @@
 <template>
-  <div class="absolute inset-0 overflow-auto text-white">
+  <div class="absolute inset-0 overflow-auto text-text-primary">
     <background-polygons />
 
     <div class="relative mx-auto flex max-w-2xl flex-col gap-4 p-6">
       <div class="flex items-center gap-3 pt-4">
         <button
-          class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
+          class="rounded-lg bg-surface-2 px-4 py-2 font-medium transition hover:bg-surface-3 active:scale-95"
           @click="emit('back')"
         >
           <game-icon name="back" :size="16" />返回
         </button>
-        <h1 class="flex items-center gap-2 text-xl font-medium text-text-primary">
+        <h1 class="flex items-center gap-2 text-lg font-medium text-text-primary">
           <game-icon name="trophy" :size="20" />排行榜
         </h1>
         <span
-          class="rounded-full px-2 py-0.5 text-xs font-black"
-          :class="isGlobal ? 'bg-lime-400 text-black' : 'bg-white/15 text-white/70'"
+          class="rounded-lg px-2 py-0.5 text-xs font-medium"
+          :class="isGlobal ? 'bg-accent text-void' : 'bg-surface-2 text-text-secondary'"
         >
           {{ isGlobal ? '全球' : '本機' }}
         </span>
@@ -26,8 +26,8 @@
         <button
           v-for="g in gameModes"
           :key="g.id"
-          class="flex-1 rounded-full px-3 py-2 text-sm font-black backdrop-blur-md transition active:scale-95"
-          :class="gameMode === g.id ? 'bg-rose-400 text-black' : 'bg-black/40 text-white/70 hover:bg-black/60'"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium transition active:scale-95"
+          :class="gameMode === g.id ? 'bg-accent text-void' : 'bg-surface-1 text-text-secondary hover:bg-surface-3'"
           @click="selectGameMode(g.id)"
         >
           {{ g.label }}
@@ -39,36 +39,36 @@
         <button
           v-for="m in boards"
           :key="m.id"
-          class="flex-1 rounded-full px-3 py-2 text-sm font-black backdrop-blur-md transition active:scale-95"
-          :class="board === m.id ? 'bg-lime-400 text-black' : 'bg-black/40 text-white/70 hover:bg-black/60'"
+          class="flex-1 rounded-lg px-3 py-2 text-sm font-medium transition active:scale-95"
+          :class="board === m.id ? 'bg-accent text-void' : 'bg-surface-1 text-text-secondary hover:bg-surface-3'"
           @click="selectBoard(m.id)"
         >
           {{ m.label }}
         </button>
       </div>
 
-      <p class="-mt-1 text-center text-xs text-white/45">{{ hint }}</p>
+      <p class="-mt-1 text-center text-xs text-text-muted">{{ hint }}</p>
 
       <!-- 難度分頁 -->
       <div class="flex flex-wrap gap-2">
         <button
           v-for="t in tabs"
           :key="t.id"
-          class="rounded-full px-3 py-1 text-sm font-black backdrop-blur-md transition active:scale-95"
-          :class="selected === t.id ? 'bg-amber-400 text-black' : 'bg-black/40 text-white/70 hover:bg-black/60'"
+          class="rounded-lg px-3 py-1 text-sm font-medium transition active:scale-95"
+          :class="selected === t.id ? 'bg-accent text-void' : 'bg-surface-1 text-text-secondary hover:bg-surface-3'"
           @click="selectTab(t.id)"
         >
           {{ t.label }}
         </button>
       </div>
 
-      <div v-if="records.length === 0" class="rounded-2xl bg-white/5 p-8 text-center text-white/60">
+      <div v-if="records.length === 0" class="rounded-2xl bg-surface-1 p-8 text-center text-text-secondary">
         {{ emptyHint }}
       </div>
 
       <!-- 死鬥榜 -->
-      <div v-else-if="gameMode === 'deathmatch'" class="overflow-hidden rounded-2xl bg-black/40 backdrop-blur-md ring-1 ring-white/10">
-        <div class="grid grid-cols-[2.5rem_1fr_3rem_3.5rem_4.5rem] gap-2 border-b border-white/10 px-4 py-2 text-xs font-black text-white/50">
+      <div v-else-if="gameMode === 'deathmatch'" class="overflow-hidden rounded-2xl bg-surface-1 border border-hairline">
+        <div class="grid grid-cols-[2.5rem_1fr_3rem_3.5rem_4.5rem] gap-2 border-b border-white/10 px-4 py-2 text-xs font-medium text-text-muted">
           <span>#</span>
           <span>玩家</span>
           <span class="text-right">波</span>
@@ -79,25 +79,25 @@
           v-for="(r, i) in records"
           :key="i"
           class="grid grid-cols-[2.5rem_1fr_3rem_3.5rem_4.5rem] items-center gap-2 px-4 py-2 text-sm"
-          :class="i % 2 ? 'bg-white/0' : 'bg-white/5'"
+          :class="i % 2 ? 'bg-surface-1' : 'bg-surface-1'"
         >
-          <span class="font-black" :class="rankClass(i)">{{ i + 1 }}</span>
-          <span class="min-w-0 truncate font-bold">
+          <span class="font-medium" :class="rankClass(i)">{{ i + 1 }}</span>
+          <span class="min-w-0 truncate font-medium">
             {{ r.name || '玩家' }}
-            <span class="text-[0.66rem] font-normal text-white/45">{{ r.character }}</span>
+            <span class="text-[0.66rem] font-normal text-text-muted">{{ r.character }}</span>
             <span v-if="selected === ''" class="ml-1 text-[0.62rem]" :style="{ color: diffColor(r.difficulty) }">
               {{ diffLabel(r.difficulty) }}
             </span>
           </span>
-          <span class="text-right font-black text-rose-300">{{ r.wave }}</span>
+          <span class="text-right font-medium text-danger">{{ r.wave }}</span>
           <span class="text-right">{{ r.kills }}</span>
-          <span class="text-right font-mono text-amber-300">{{ r.score }}</span>
+          <span class="text-right font-mono text-accent">{{ r.score }}</span>
         </div>
       </div>
 
       <!-- 劇情榜（破關/生存） -->
-      <div v-else class="overflow-hidden rounded-2xl bg-black/40 backdrop-blur-md ring-1 ring-white/10">
-        <div class="grid grid-cols-[2.5rem_1fr_4.5rem_3.5rem_3rem] gap-2 border-b border-white/10 px-4 py-2 text-xs font-black text-white/50">
+      <div v-else class="overflow-hidden rounded-2xl bg-surface-1 border border-hairline">
+        <div class="grid grid-cols-[2.5rem_1fr_4.5rem_3.5rem_3rem] gap-2 border-b border-white/10 px-4 py-2 text-xs font-medium text-text-muted">
           <span>#</span>
           <span>玩家</span>
           <span class="text-right">{{ board === 'cleared' ? '破關' : '存活' }}</span>
@@ -108,17 +108,17 @@
           v-for="(r, i) in records"
           :key="i"
           class="grid grid-cols-[2.5rem_1fr_4.5rem_3.5rem_3rem] items-center gap-2 px-4 py-2 text-sm"
-          :class="i % 2 ? 'bg-white/0' : 'bg-white/5'"
+          :class="i % 2 ? 'bg-surface-1' : 'bg-surface-1'"
         >
-          <span class="font-black" :class="rankClass(i)">{{ i + 1 }}</span>
-          <span class="min-w-0 truncate font-bold">
+          <span class="font-medium" :class="rankClass(i)">{{ i + 1 }}</span>
+          <span class="min-w-0 truncate font-medium">
             {{ r.name || '玩家' }}
-            <span class="text-[0.66rem] font-normal text-white/45">{{ r.character }}</span>
+            <span class="text-[0.66rem] font-normal text-text-muted">{{ r.character }}</span>
             <span v-if="selected === ''" class="ml-1 text-[0.62rem]" :style="{ color: diffColor(r.difficulty) }">
               {{ diffLabel(r.difficulty) }}
             </span>
           </span>
-          <span class="text-right font-mono" :class="board === 'cleared' ? 'text-amber-300' : ''">{{ timeText(r.time) }}</span>
+          <span class="text-right font-mono" :class="board === 'cleared' ? 'text-accent' : ''">{{ timeText(r.time) }}</span>
           <span class="text-right">{{ r.kills }}</span>
           <span class="text-right">{{ r.level }}</span>
         </div>
@@ -205,7 +205,7 @@ function timeText(t: number) {
   return `${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, '0')}`;
 }
 function rankClass(i: number) {
-  return ['text-amber-300', 'text-slate-200', 'text-orange-400'][i] ?? 'text-white/50';
+  return ['text-accent', 'text-text-primary', 'text-text-secondary'][i] ?? 'text-text-muted';
 }
 function diffLabel(id: string) {
   const d = getDifficulty(id || 'easy');

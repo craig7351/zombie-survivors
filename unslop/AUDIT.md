@@ -15,18 +15,46 @@
 
 **（b）稽核範圍。** 19 個 component、2080 行。同一套 slop 語彙貫穿全站：玻璃卡片、`font-black`、`rounded-full`、emoji 圖示。這不是單頁問題，是**設計系統層級**的問題。
 
+> ★ **數字已於改造收尾時重測並更正**（見下方「更正紀錄」）。原始的 grep 口徑漏掉了帶後綴的 class
+> （`backdrop-blur-md`）與 style 區塊寫法，數字偏小。
+
 ## 1. 渲染後 DOM 實測（landing 頁）
 
 | 項目 | 次數 |
 |---|---|
-| `backdrop-blur` 玻璃模糊 | 19 |
-| `font-black`（字重 900） | 9 |
-| `rounded-full` 全藥丸 | 20 |
-| `tracking-widest` | 6 |
-| `bg-black/30` 半透明疊底 | 6 |
-| `animate-ping` 呼吸光點 | 4 |
+| `backdrop-blur` 玻璃模糊 | 7 |
+| `font-black`（字重 900） | 8 |
+| `font-bold`（字重 700） | 3 |
+| `rounded-full` 全藥丸 | 5 |
+| `tracking-widest` | 2 |
+| `bg-black/40` 半透明疊底 | 7 |
+| `animate-ping` 呼吸光點 | 1 |
 
-全站 emoji：**148 處、67 種**（`src/` 全部 .vue/.ts）。
+**全站**（`src/` 全部 .vue/.ts/.css，剝除 `style.css` 的 token 定義）：
+
+| 項目 | 改前 | 改後 |
+|---|---|---|
+| `backdrop-blur` | 48 | **0** |
+| `backdrop-filter`（style 寫法） | 2 | **0** |
+| `font-black` | 90 | **0** |
+| `font-bold` | 14 | **0** |
+| `rounded-full` | 46 | 8（全為圓形圖形元件，容器型 0） |
+| `tracking-widest` / `tracking-wider` | 5 / 8 | **0 / 0** |
+| `animate-ping` | 1 | **0** |
+| `gradient-to` | 5 | **0** |
+| `text-shadow` | 3 | **0** |
+| `drop-shadow-` | 1 | **0** |
+| emoji | **153 處、66 種** | **0 處、0 種** |
+
+### 更正紀錄
+
+原始稽核用 `grep` 統計，出現兩個系統性低估：
+
+1. **帶後綴的 class 被漏掉** — `backdrop-blur-md`／`backdrop-blur-sm` 不符合只找 `backdrop-blur` 的比對條件，
+   而全站幾乎都是帶後綴的寫法，於是「首頁＋HUD 清零」的表象下，全站其實還剩 32 處。
+2. **style 區塊的 CSS 寫法被漏掉** — 例如 `mode-screen.vue` 的 `backdrop-filter: blur(6px);`。
+
+**這一課本身就是教材重點**：沒有全站、且口徑正確的掃描，就會以為自己改完了。
 
 ## 2. Slop 徵兆清單
 
@@ -40,7 +68,7 @@
 7. **玻璃底下的彩色 ring** — `ring-lime-400/20`、`ring-rose-400/50`、`ring-amber-300`、`ring-fuchsia-500/80` 等彩色邊框散落各處。
 
 ### 字體
-8. **字重 900 當階層** — `font-black` 共 100+ 處（`menu-screen.vue` 12、`leaderboard-screen.vue` 11、`game-over-modal.vue` 9、`victory-modal.vue` 8…）。標題、卡名、按鈕文字、數字、標籤全部 900，等於沒有階層。
+8. **字重 900 當階層** — `font-black` 共 90 處（`menu-screen.vue` 12、`leaderboard-screen.vue` 11、`game-over-modal.vue` 9、`victory-modal.vue` 8…）。標題、卡名、按鈕文字、數字、標籤全部 900，等於沒有階層。
 9. **寬字距** — `tracking-widest`（主標題、王血條、更新紀錄）、`tracking-wider`（各頁 h1）、`tracking-wide`（副標）。中文不需要。
 10. **自訂非階梯字級** — `text-[0.72rem]`、`text-[0.66rem]`、`text-[0.6rem]`、`text-[0.26em]`（版本徽章）等任意值。
 11. **HUD 狀態擠在一排** — FPS/敵人/擊殺/時間/波數/突變子六個不同語意的數值，字重與顏色各自為政（`text-green-300`/`text-amber-300`/`text-red-300` 三色判 FPS）。
