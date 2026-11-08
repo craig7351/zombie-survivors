@@ -24,8 +24,9 @@
         </div>
       </div>
 
-      <div class="mb-6 rounded-2xl bg-amber-400/15 py-2 text-xl font-black text-amber-300">
-        獲得 💰 {{ stats.goldEarned }}
+      <div class="mb-6 flex items-center justify-center gap-2 rounded-xl bg-surface-2 py-2 text-xl font-medium text-accent">
+        <game-icon name="coins" :size="20" />
+        獲得 <span class="num">{{ stats.goldEarned }}</span> 金幣
       </div>
 
       <div class="flex gap-3">
@@ -49,13 +50,14 @@
         rel="noopener"
         class="mt-3 block rounded-full bg-[#1877f2] px-4 py-2.5 text-center text-sm font-black text-white transition hover:bg-[#3b8bf5] active:scale-95"
       >
-        👍 加我粉專獲得最新遊戲資訊
+        加我粉專獲得最新遊戲資訊
       </a>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import GameIcon from './game-icon.vue';
 import { computed } from 'vue';
 import type { GameStats } from '../game/game';
 

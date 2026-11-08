@@ -8,9 +8,11 @@
           class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
           @click="emit('back')"
         >
-          ← 返回
+          <game-icon name="back" :size="16" />返回
         </button>
-        <h1 class="text-2xl font-black tracking-wider sm:text-3xl">📈 線上人數</h1>
+        <h1 class="flex items-center gap-2 text-xl font-medium text-text-primary">
+          <game-icon name="chart" :size="20" />線上人數
+        </h1>
       </div>
 
       <!-- 區間切換 -->
@@ -74,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import GameIcon from './game-icon.vue';
 import { computed, onMounted, ref } from 'vue';
 import BackgroundPolygons from './background-polygons.vue';
 import { fetchOnlineHistory, type OnlineHourPoint } from '../game/api';

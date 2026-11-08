@@ -8,16 +8,18 @@
           class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
           @click="emit('back')"
         >
-          ← 返回
+          <game-icon name="back" :size="16" />返回
         </button>
-        <h1 class="text-3xl font-black tracking-wider">💬 留言板</h1>
+        <h1 class="flex items-center gap-2 text-xl font-medium text-text-primary">
+          <game-icon name="messages" :size="20" />留言板
+        </h1>
       </div>
 
       <!-- 發表留言 / 回覆 -->
       <div class="flex flex-col gap-2 rounded-2xl bg-black/40 p-4 backdrop-blur-md ring-1 ring-white/10">
         <div v-if="replyTo" class="flex items-center justify-between rounded-lg bg-lime-400/15 px-3 py-1 text-xs">
           <span class="text-lime-300">回覆 @{{ replyTo.name || '匿名' }}</span>
-          <button class="text-white/60 hover:text-white" @click="replyTo = null">✕ 取消</button>
+          <button class="text-white/60 hover:text-white" @click="replyTo = null"><game-icon name="close" :size="14" />取消</button>
         </div>
         <input
           v-model="name"
@@ -59,8 +61,8 @@
           </div>
           <p class="mt-1 whitespace-pre-wrap break-words text-sm text-white/85">{{ t.msg.text }}</p>
           <div class="mt-1 flex gap-3 text-[0.7rem]">
-            <button class="text-lime-300/80 hover:text-lime-300" @click="startReply(t.msg)">↩ 回覆</button>
-            <button class="text-rose-300/70 hover:text-rose-300" @click="onDelete(t.msg.id)">🗑 刪除</button>
+            <button class="text-lime-300/80 hover:text-lime-300" @click="startReply(t.msg)"><game-icon name="reply" :size="14" />回覆</button>
+            <button class="text-rose-300/70 hover:text-rose-300" @click="onDelete(t.msg.id)"><game-icon name="trash" :size="14" />刪除</button>
           </div>
 
           <!-- 回覆 -->
@@ -71,7 +73,7 @@
                 <span class="shrink-0 text-[0.62rem] text-white/40">{{ timeText(r.at) }}</span>
               </div>
               <p class="whitespace-pre-wrap break-words text-sm text-white/80">{{ r.text }}</p>
-              <button class="text-[0.66rem] text-rose-300/70 hover:text-rose-300" @click="onDelete(r.id)">🗑 刪除</button>
+              <button class="text-[0.66rem] text-rose-300/70 hover:text-rose-300" @click="onDelete(r.id)"><game-icon name="trash" :size="14" />刪除</button>
             </div>
           </div>
         </div>
@@ -81,6 +83,7 @@
 </template>
 
 <script setup lang="ts">
+import GameIcon from './game-icon.vue';
 import { computed, onMounted, ref } from 'vue';
 import BackgroundPolygons from './background-polygons.vue';
 import { fetchMessages, postMessage, deleteMessage, type Message } from '../game/api';

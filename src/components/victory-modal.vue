@@ -1,7 +1,7 @@
 <template>
   <div class="absolute inset-0 z-20 flex items-center justify-center bg-black/70 backdrop-blur-sm">
     <div class="w-[min(90vw,28rem)] rounded-3xl bg-gradient-to-b from-[#241a36] to-[#1a2236] p-8 text-center text-white shadow-2xl ring-1 ring-amber-300/30">
-      <div class="text-2xl">🏆</div>
+      <div class="text-text-accent"><game-icon name="trophy" :size="28" /></div>
       <div class="text-4xl font-black text-amber-300">{{ stats.mode === 'deathmatch' ? '死鬥通關！' : '破關成功！' }}</div>
       <div class="mt-1 text-sm text-white/70">
         {{ stats.mode === 'deathmatch' ? `撐過 ${stats.wave} 波殭屍潮` : `擊敗全部 ${stats.bossTotal} 隻殭屍王` }}
@@ -23,7 +23,7 @@
       </div>
 
       <div class="mb-6 rounded-2xl bg-amber-400/15 py-2 text-xl font-black text-amber-300">
-        獲得 💰 {{ stats.goldEarned }}（含破關獎勵）
+        獲得 <span class="num">{{ stats.goldEarned }}</span> 金幣（含破關獎勵）
       </div>
 
       <div class="flex gap-3">
@@ -47,13 +47,14 @@
         rel="noopener"
         class="mt-3 block rounded-full bg-[#1877f2] px-4 py-2.5 text-center text-sm font-black text-white transition hover:bg-[#3b8bf5] active:scale-95"
       >
-        👍 加我粉專獲得最新遊戲資訊
+        加我粉專獲得最新遊戲資訊
       </a>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import GameIcon from './game-icon.vue';
 import { computed } from 'vue';
 import type { GameStats } from '../game/game';
 

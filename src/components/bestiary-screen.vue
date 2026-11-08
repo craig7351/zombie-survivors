@@ -8,9 +8,11 @@
           class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
           @click="emit('back')"
         >
-          ← 返回
+          <game-icon name="back" :size="16" />返回
         </button>
-        <h1 class="text-3xl font-black tracking-wider">🧟 怪物圖鑑</h1>
+        <h1 class="flex items-center gap-2 text-xl font-medium text-text-primary">
+          <game-icon name="bestiary" :size="20" />怪物圖鑑
+        </h1>
       </div>
 
       <!-- 怪物 -->
@@ -23,7 +25,9 @@
             class="flex flex-col items-center gap-1 rounded-2xl bg-white/5 p-3 text-center ring-1 ring-white/10"
           >
             <img v-if="modelThumbs[z.model]" :src="modelThumbs[z.model]" class="h-24 w-24 rounded-xl" :alt="z.name" />
-            <span v-else class="flex h-24 w-24 items-center justify-center text-5xl">🧟</span>
+            <span v-else class="flex h-24 w-24 items-center justify-center">
+              <game-icon name="bestiary" :size="28" class="text-text-muted" />
+            </span>
             <div class="font-black">{{ z.name }}</div>
             <div class="text-[0.72rem] font-bold text-emerald-300/80">{{ z.role }}</div>
             <div class="text-[0.68rem] leading-snug text-white/55">{{ z.desc }}</div>
@@ -41,7 +45,9 @@
             class="flex items-center gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10"
           >
             <img v-if="modelThumbs[b.model]" :src="modelThumbs[b.model]" class="h-20 w-20 shrink-0 rounded-xl" :alt="b.name" />
-            <span v-else class="flex h-20 w-20 shrink-0 items-center justify-center text-4xl">🧟‍♂️</span>
+            <span v-else class="flex h-20 w-20 shrink-0 items-center justify-center">
+              <game-icon name="skull" :size="24" class="text-text-muted" />
+            </span>
             <div class="min-w-0">
               <div class="font-black">{{ i + 1 }}. {{ b.name }}</div>
               <div class="text-xs font-bold text-rose-300/80">招式：{{ b.skill }}</div>
@@ -55,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import GameIcon from './game-icon.vue';
 import { onMounted, ref } from 'vue';
 import BackgroundPolygons from './background-polygons.vue';
 import { ZOMBIE_INFO } from '../game/zombie-horde';

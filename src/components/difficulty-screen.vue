@@ -8,7 +8,7 @@
           class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
           @click="emit('back')"
         >
-          ← 返回
+          <game-icon name="back" :size="16" />返回
         </button>
         <h1 class="text-3xl font-black tracking-wider">選擇難度</h1>
       </div>
@@ -21,7 +21,7 @@
           :style="{ background: `linear-gradient(90deg, ${d.color}22, rgba(255,255,255,0.05))` }"
           @click="emit('select', d.id)"
         >
-          <span class="text-4xl">{{ d.emoji }}</span>
+          <game-icon :name="d.icon" :size="22" class="text-text-secondary" />
           <div class="flex-1">
             <div class="text-xl font-black" :style="{ color: d.color }">{{ d.name }}</div>
             <div class="text-sm text-white/60">{{ d.desc }}</div>
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import BackgroundPolygons from './background-polygons.vue';
 import { DIFFICULTIES } from '../game/difficulty';
+import GameIcon from './game-icon.vue';
 
 const emit = defineEmits<{
   (e: 'select', id: string): void;

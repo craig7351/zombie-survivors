@@ -8,9 +8,11 @@
           class="rounded-full bg-white/10 px-4 py-2 font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
           @click="emit('back')"
         >
-          ← 返回
+          <game-icon name="back" :size="16" />返回
         </button>
-        <h1 class="text-3xl font-black tracking-wider">🏆 排行榜</h1>
+        <h1 class="flex items-center gap-2 text-xl font-medium text-text-primary">
+          <game-icon name="trophy" :size="20" />排行榜
+        </h1>
         <span
           class="rounded-full px-2 py-0.5 text-xs font-black"
           :class="isGlobal ? 'bg-lime-400 text-black' : 'bg-white/15 text-white/70'"
@@ -126,6 +128,7 @@
 </template>
 
 <script setup lang="ts">
+import GameIcon from './game-icon.vue';
 import { computed, onMounted, ref } from 'vue';
 import BackgroundPolygons from './background-polygons.vue';
 import { loadRecords, type RunRecord } from '../game/leaderboard';
@@ -137,14 +140,14 @@ const emit = defineEmits<{ (e: 'back'): void }>();
 type GameMode = 'story' | 'deathmatch';
 type Board = 'cleared' | 'survival';
 const gameModes: { id: GameMode; label: string }[] = [
-  { id: 'story', label: '🧟 劇情模式' },
-  { id: 'deathmatch', label: '💀 死鬥模式' },
+  { id: 'story', label: '劇情模式' },
+  { id: 'deathmatch', label: '死鬥模式' },
 ];
 const boards: { id: Board; label: string }[] = [
-  { id: 'cleared', label: '🏆 破關榜' },
-  { id: 'survival', label: '🛡️ 生存榜' },
+  { id: 'cleared', label: '破關榜' },
+  { id: 'survival', label: '生存榜' },
 ];
-const tabs = [{ id: '', label: '全部' }, ...DIFFICULTIES.map((d) => ({ id: d.id, label: `${d.emoji} ${d.name}` }))];
+const tabs = [{ id: '', label: '全部' }, ...DIFFICULTIES.map((d) => ({ id: d.id, label: d.name }))];
 
 const gameMode = ref<GameMode>('story');
 const board = ref<Board>('cleared');
@@ -206,7 +209,7 @@ function rankClass(i: number) {
 }
 function diffLabel(id: string) {
   const d = getDifficulty(id || 'easy');
-  return `${d.emoji}${d.name}`;
+  return d.name;
 }
 function diffColor(id: string) {
   return getDifficulty(id || 'easy').color;

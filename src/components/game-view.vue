@@ -29,7 +29,7 @@
         class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 bg-black/40 text-base text-white backdrop-blur-md sm:text-xl transition hover:bg-black/60 active:scale-95"
         @click="onToggleMute"
       >
-        {{ muted ? '🔇' : '🔊' }}
+        <game-icon :name="muted ? 'mute' : 'sound'" :size="16" />
       </button>
       <select
         v-model="quality"
@@ -37,27 +37,27 @@
         title="畫質"
         class="h-9 rounded-full border-0 bg-black/40 px-2 text-xs text-white outline-none backdrop-blur-md transition hover:bg-black/60 sm:h-11 sm:px-3 sm:text-sm"
       >
-        <option v-for="q in qualities" :key="q.id" :value="q.id" class="bg-zinc-900 text-white">🎚 {{ q.name }}畫質</option>
+        <option v-for="q in qualities" :key="q.id" :value="q.id" class="bg-zinc-900 text-white">{{ q.name }}畫質</option>
       </select>
       <button
         class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 bg-black/40 text-base text-white backdrop-blur-md sm:text-xl transition hover:bg-black/60 active:scale-95"
         @click="onTogglePause"
       >
-        ⏸
+        <game-icon name="pause" :size="16" />
       </button>
       <button
         class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 text-base text-white backdrop-blur-md sm:text-xl transition active:scale-95"
         :class="showStats ? 'bg-cyan-500' : 'bg-black/40 hover:bg-black/60'"
         @click="onToggleStats"
       >
-        📊
+        <game-icon name="chart" :size="16" />
       </button>
       <button
         class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 text-base text-white backdrop-blur-md sm:text-xl transition active:scale-95"
         :class="showDebug ? 'bg-fuchsia-500' : 'bg-black/40 hover:bg-black/60'"
         @click="onToggleDebug"
       >
-        🛠️
+        <game-icon name="wrench" :size="16" />
       </button>
     </div>
 
@@ -73,7 +73,8 @@
         class="mb-1 flex items-center justify-between"
         :class="u.level === 0 ? 'text-white/40' : ''"
       >
-        <span>{{ u.emoji }} {{ u.name }}</span>
+        <game-icon :name="u.icon" :size="14" class="text-text-secondary" />
+          <span>{{ u.name }}</span>
         <span class="font-bold" :class="u.level >= u.maxLevel ? 'text-amber-300' : 'text-white/80'">
           Lv {{ u.level }}/{{ u.maxLevel }}
         </span>
@@ -196,6 +197,7 @@ import {
 import { QUALITIES, type QualityId } from '../game/quality';
 import type { RunState } from '../game/upgrades';
 import type { Difficulty } from '../game/difficulty';
+import GameIcon from './game-icon.vue';
 import Hud from './hud.vue';
 import Joystick from './joystick.vue';
 import LevelUpModal from './level-up-modal.vue';

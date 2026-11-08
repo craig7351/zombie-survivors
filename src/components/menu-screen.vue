@@ -5,7 +5,7 @@
       class="absolute left-3 top-3 z-10 rounded-full bg-white/10 px-4 py-1 text-sm font-black backdrop-blur-md transition hover:bg-white/20 active:scale-95"
       @click="emit('home')"
     >
-      ← 首頁
+      <game-icon name="back" :size="16" />首頁
     </button>
 
     <!-- Debug 開關 -->
@@ -15,14 +15,14 @@
         :class="debug ? 'bg-lime-400 text-black' : 'bg-white/10 text-white/60'"
         @click="toggleDebug"
       >
-        🛠 Debug {{ debug ? 'ON' : 'OFF' }}
+        <game-icon name="wrench" :size="14" />Debug {{ debug ? 'ON' : 'OFF' }}
       </button>
       <button
         v-if="debug"
         class="rounded-full bg-amber-400 px-3 py-1 text-xs font-black text-black"
         @click="emit('add-gold', 1000)"
       >
-        +1000💰
+        +1000 金幣
       </button>
     </div>
 
@@ -32,7 +32,7 @@
         <div class="text-5xl font-black tracking-wider">殭屍大逃殺</div>
         <div class="mt-1 text-sm text-white/60">在殭屍潮中倖存・3D 倖存者類 roguelite</div>
         <div class="mt-3 inline-block rounded-full bg-amber-400/90 px-5 py-1 text-lg font-black text-black">
-          💰 {{ meta.gold }}
+          <span class="num">{{ meta.gold }}</span> 金幣
         </div>
       </div>
 
@@ -56,9 +56,9 @@
               />
               <span
                 v-if="!ready[c.id]"
-                class="absolute inset-0 flex items-center justify-center text-5xl"
+                class="absolute inset-0 flex items-center justify-center"
               >
-                {{ c.emoji }}
+                <game-icon :name="c.icon" :size="28" class="text-text-muted" />
               </span>
             </div>
             <span class="font-black">{{ c.name }}</span>
@@ -69,7 +69,7 @@
               class="mt-1 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-black text-black"
               :class="{ 'opacity-40': meta.gold < c.cost }"
             >
-              解鎖 💰{{ c.cost }}
+              解鎖 {{ c.cost }} 金幣
             </span>
           </div>
         </div>
@@ -84,7 +84,7 @@
             :key="p.id"
             class="flex items-center gap-3 rounded-2xl bg-white/5 p-3"
           >
-            <span class="text-2xl">{{ p.emoji }}</span>
+            <game-icon :name="p.icon" :size="18" class="text-text-secondary" />
             <div class="flex-1">
               <div class="font-black">{{ p.name }} <span class="text-white/50">{{ level(p.id) }}/{{ p.maxLevel }}</span></div>
               <div class="text-xs text-white/60">{{ p.desc }}</div>
@@ -95,7 +95,7 @@
               :disabled="!canBuy(p)"
               @click="emit('buy', p.id)"
             >
-              {{ level(p.id) >= p.maxLevel ? '已滿' : `💰${cost(p)}` }}
+              {{ level(p.id) >= p.maxLevel ? '已滿' : `${cost(p)} 金幣` }}
             </button>
           </div>
         </div>
@@ -106,7 +106,7 @@
         class="sticky bottom-4 mt-2 w-full rounded-full bg-amber-400 py-4 text-2xl font-black text-black shadow-lg transition hover:bg-amber-300 active:scale-95"
         @click="emit('start', selectedId)"
       >
-        ▶ 開始（{{ selectedName }}）
+        <game-icon name="play" :size="20" />開始（{{ selectedName }}）
       </button>
 
     </div>
@@ -118,6 +118,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { CHARACTERS, getCharacter, type Character } from '../game/characters';
 import { PERMA, permaCost, type MetaData, type PermaUpgrade } from '../game/meta';
 import { setupCharacterPreview, type PreviewHandle } from '../game/character-previews';
+import GameIcon from './game-icon.vue';
 
 const props = defineProps<{ meta: MetaData }>();
 const emit = defineEmits<{

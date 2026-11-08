@@ -24,12 +24,12 @@ export type GameMode = 'story' | 'deathmatch';
 
 /** 死鬥「祝福／詛咒」二選一（高風險高報酬，套用至 RunState） */
 const BLESSINGS: Upgrade[] = [
-  { id: 'bc_berserk', name: '嗜血狂戰', emoji: '⚔️', desc: '傷害 +45%，但最大生命 -30', maxLevel: 99, apply: (s) => { s.damage = Math.ceil(s.damage * 1.45); s.maxHp = Math.max(20, s.maxHp - 30); } },
-  { id: 'bc_tank', name: '鋼鐵之軀', emoji: '🛡️', desc: '減傷 +20%，但移速 -15%', maxLevel: 99, apply: (s) => { s.damageReduction = Math.min(0.7, s.damageReduction + 0.2); s.moveSpeed *= 0.85; } },
-  { id: 'bc_swift', name: '疾風之刃', emoji: '🌪️', desc: '攻速 +30%，但傷害 -15%', maxLevel: 99, apply: (s) => { s.fireInterval *= 0.7; s.damage = Math.max(1, Math.round(s.damage * 0.85)); } },
-  { id: 'bc_crit', name: '賭命一擊', emoji: '🎯', desc: '暴擊 +30%，但攻速 -10%', maxLevel: 99, apply: (s) => { s.critChance = Math.min(0.85, s.critChance + 0.3); s.fireInterval *= 1.1; } },
-  { id: 'bc_greed', name: '貪婪', emoji: '🧲', desc: '經驗 +60%、拾取 +60%，但最大生命 -20', maxLevel: 99, apply: (s) => { s.xpMultiplier *= 1.6; s.pickupRadius *= 1.6; s.maxHp = Math.max(20, s.maxHp - 20); } },
-  { id: 'bc_rage', name: '狂暴化', emoji: '💉', desc: '傷害 +70%，但減傷 -25%', maxLevel: 99, apply: (s) => { s.damage = Math.ceil(s.damage * 1.7); s.damageReduction = Math.max(0, s.damageReduction - 0.25); } },
+  { id: 'bc_berserk', name: '嗜血狂戰', icon: 'might', desc: '傷害 +45%，但最大生命 -30', maxLevel: 99, apply: (s) => { s.damage = Math.ceil(s.damage * 1.45); s.maxHp = Math.max(20, s.maxHp - 30); } },
+  { id: 'bc_tank', name: '鋼鐵之軀', icon: 'armor', desc: '減傷 +20%，但移速 -15%', maxLevel: 99, apply: (s) => { s.damageReduction = Math.min(0.7, s.damageReduction + 0.2); s.moveSpeed *= 0.85; } },
+  { id: 'bc_swift', name: '疾風之刃', icon: 'firerate', desc: '攻速 +30%，但傷害 -15%', maxLevel: 99, apply: (s) => { s.fireInterval *= 0.7; s.damage = Math.max(1, Math.round(s.damage * 0.85)); } },
+  { id: 'bc_crit', name: '賭命一擊', icon: 'crit', desc: '暴擊 +30%，但攻速 -10%', maxLevel: 99, apply: (s) => { s.critChance = Math.min(0.85, s.critChance + 0.3); s.fireInterval *= 1.1; } },
+  { id: 'bc_greed', name: '貪婪', icon: 'greed', desc: '經驗 +60%、拾取 +60%，但最大生命 -20', maxLevel: 99, apply: (s) => { s.xpMultiplier *= 1.6; s.pickupRadius *= 1.6; s.maxHp = Math.max(20, s.maxHp - 20); } },
+  { id: 'bc_rage', name: '狂暴化', icon: 'damage', desc: '傷害 +70%，但減傷 -25%', maxLevel: 99, apply: (s) => { s.damage = Math.ceil(s.damage * 1.7); s.damageReduction = Math.max(0, s.damageReduction - 0.25); } },
 ];
 import { scatterGroundDecals, buildRoads } from './ground-decals';
 import { CONFIG } from './config';
@@ -53,7 +53,8 @@ export interface ChoiceView {
   id: string;
   name: string;
   desc: string;
-  emoji: string;
+  /** lucide 圖示 key（見 ui/icons.ts） */
+  icon: string;
 }
 
 export interface GameStats {
@@ -153,7 +154,8 @@ export interface GameHandle {
 
 export interface UpgradeStatusView {
   name: string;
-  emoji: string;
+  /** lucide 圖示 key（見 ui/icons.ts） */
+  icon: string;
   level: number;
   maxLevel: number;
 }
@@ -520,7 +522,7 @@ export function createGame(canvas: HTMLCanvasElement, options: GameOptions = {})
     stats.xp = Math.floor(xp);
     stats.xpToNext = xpToNext;
     stats.state = state;
-    stats.choices = choices.map((c) => ({ id: c.id, name: c.name, desc: c.desc, emoji: c.emoji }));
+    stats.choices = choices.map((c) => ({ id: c.id, name: c.name, desc: c.desc, icon: c.icon }));
     stats.bossActive = boss.active;
     stats.bossHp = Math.max(0, Math.ceil(boss.hp));
     stats.bossMaxHp = boss.maxHp;
@@ -535,9 +537,9 @@ export function createGame(canvas: HTMLCanvasElement, options: GameOptions = {})
     stats.pendingLevels = pendingLevelUps;
     stats.mutator = isDM
       ? time < bloodTideUntil
-        ? '🩸 血潮來襲'
+        ? '血潮來襲'
         : curMutator
-          ? `${curMutator.emoji} ${curMutator.name}`
+          ? curMutator.name
           : ''
       : '';
     options.onStats?.(stats);
@@ -680,9 +682,9 @@ export function createGame(canvas: HTMLCanvasElement, options: GameOptions = {})
         waveCardText = isBossWave
           ? `第 ${wave} 波・王來了！`
           : isTideWave
-            ? '🩸 血潮來襲！'
+            ? '血潮來襲！'
             : curMutator
-              ? `突變：${curMutator.emoji}${curMutator.name}`
+              ? `突變：${curMutator.name}`
               : milestone
                 ? `第 ${wave} 波！！`
                 : `第 ${wave} 波`;
@@ -1213,7 +1215,7 @@ export function createGame(canvas: HTMLCanvasElement, options: GameOptions = {})
     getUpgradeStatus() {
       return UPGRADES.map((u) => ({
         name: u.name,
-        emoji: u.emoji,
+        icon: u.icon,
         level: levels[u.id] ?? 0,
         maxLevel: u.maxLevel,
       }));

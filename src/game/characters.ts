@@ -3,7 +3,8 @@ import type { RunState } from './upgrades';
 export interface Character {
   id: string;
   name: string;
-  emoji: string;
+  /** lucide 圖示 key（見 ui/icons.ts） */
+  icon: string;
   /** 解鎖所需金幣，0 為預設已解鎖 */
   cost: number;
   /** 一句話特性（標籤） */
@@ -22,7 +23,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'matt',
     name: '麥特',
-    emoji: '🔫',
+    icon: 'survivor',
     cost: 0,
     trait: '均衡｜起始攻擊：強化單發子彈',
     desc: '各項數值標準、無弱點，適合新手。起手傷害 +1，穩定單發點放，靠升級自由組合流派。',
@@ -35,7 +36,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'lis',
     name: '莉絲',
-    emoji: '👟',
+    icon: 'runner',
     cost: 300,
     trait: '高速脆皮｜起始攻擊：三連發散射',
     desc: '移速 +20%、生命 −25。開局子彈一次噴三發扇形散彈，近距離火力強，但血薄要靠走位。',
@@ -50,7 +51,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'sam',
     name: '山姆',
-    emoji: '⚡',
+    icon: 'gunner',
     cost: 300,
     trait: '輸出爆發｜起始攻擊：極速連射',
     desc: '發射間隔 −45%、生命 −15。子彈如雨般極速連射，單體輸出爆裂，疊攻擊力後非常猛。',
@@ -64,7 +65,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'shaun',
     name: '尚恩',
-    emoji: '🧲',
+    icon: 'scavenger',
     cost: 200,
     trait: '拾取廣｜起始攻擊：環繞飛斧',
     desc: '拾取範圍 +70%、經驗 +20%，升級最快。開局自帶一把環繞旋轉的飛斧近身保護。',
@@ -79,7 +80,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'shepherd',
     name: '德國狼犬',
-    emoji: '🐕',
+    icon: 'dog',
     cost: 400,
     trait: '機動忠犬｜起始攻擊：連鎖閃電',
     desc: '移速 +15%、射程 +15%，機動風箏流。開局定期釋放連鎖閃電，自動電擊並跳躍清怪。',
@@ -94,7 +95,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'pug',
     name: '巴哥犬',
-    emoji: '🐶',
+    icon: 'pug',
     cost: 350,
     trait: '肉盾｜起始攻擊：傷害光環',
     desc: '生命 +40、移速 −10%，超耐打。身上展開傷害光環，持續灼燒貼近的殭屍，適合衝進怪堆。',
@@ -109,7 +110,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'anne',
     name: '砲手安妮',
-    emoji: '💥',
+    icon: 'cannon',
     cost: 400,
     trait: '範圍轟炸｜起始攻擊：新星爆',
     desc: '開局即有定期向外擴張的新星爆，清群能力極強，適合站陣中央炸怪。',
@@ -123,7 +124,7 @@ export const CHARACTERS: Character[] = [
   {
     id: 'mako',
     name: '鯊牙馬可',
-    emoji: '🦈',
+    icon: 'shark',
     cost: 450,
     trait: '暴擊爆發｜起始攻擊：高暴擊',
     desc: '30% 暴擊率開局，子彈常打出 2 倍傷害，單體爆發兇猛；疊攻擊力後更可怕。',
