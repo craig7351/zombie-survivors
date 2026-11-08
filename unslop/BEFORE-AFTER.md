@@ -41,6 +41,43 @@
 
 > ★ 這段「計數口徑」本身就是教材價值最高的段落：**掃描工具寫錯，數字就會說謊，而且看起來很像真的。**
 
+### 1.0.5 ★ 最終稽核：渲染後 DOM 全站逐畫面實測
+
+★ 小關要求「每個 component 改完用渲染後 DOM 驗，不看原始碼 grep」——★ 這是本專案最嚴格也最該做的一步。
+★ 稽核腳本：`unslop/audit-dom.mjs`（Playwright 走訪 10 個畫面，★ ★ 逐元素讀 `class` token 精確比對）
+
+| 畫面 | 元素數 | emoji | slop 徵兆 |
+|---|---:|---:|---|
+| landing（首頁） | 58 | 0 | **全部 0** |
+| leaderboard（排行榜） | 55 | 0 | **全部 0** |
+| bestiary（怪物圖鑑） | 132 | 0 | **全部 0** |
+| messages（留言板） | 41 | 0 | **全部 0** |
+| onlineHistory（線上人數） | 47 | 0 | **全部 0** |
+| mode（模式頁） | 46 | 0 | **全部 0** |
+| difficulty（難度頁） | 82 | 0 | **全部 0** |
+| menu（遊戲內選單） | 132 | 0 | **全部 0** |
+| game-hud（遊戲內 HUD） | 47 | 0 | `rounded-full` = 6 |
+| pause-menu（暫停選單） | 54 | 0 | **全部 0** |
+| **全站合計** | **694** | **0** | **全部 0**（`rounded-full` 6） |
+
+★ 全站 `backdrop-blur` / `backdrop-filter` / `font-black` / `font-extrabold` / `font-bold` /
+★ `tracking-widest` / `tracking-wider` / `animate-ping` / `text-shadow` / `drop-shadow` /
+★ `bg-black/*` / `ring-1` / `ring-2` / `shadow-2xl` / `gradient-to` / emoji —— ★ ★ **渲染後 DOM 實測全部為 0**。
+
+★ ★ ★ **這一次稽核又抓到兩個「原始碼掃描看不到」的問題**，★ ★ 值得單獨列出：
+
+**問題一：`rounded-full` 數到 12，但實際只有 6。**
+★ HUD 在 `game-view` 裡是**常駐掛載**的，★ ★ 切到暫停選單時 HUD 仍在 DOM 裡，★ ★ 不去重就會把同一批元素數兩次。
+★ ★ 修正：稽核腳本給每個元素掛 `data-audit-id`，★ ★ 用 `Set` 做全域去重，★ ★ 只統計「本畫面新增」的元素。
+
+**問題二：原始碼 8 處，渲染後 6 處，★ ★ 差在王血條。**
+★ 王血條是 `v-if="stats.bossActive"`，★ ★ 平時不渲染，★ ★ 所以正常遊玩時 DOM 只有 6 處。
+★ ★ **兩個數字都對**，★ ★ 差別是「王是否在場」——★ ★ 這就是為什麼教材的數字必須標明口徑。
+
+> ★ ★ ★ **教材題眼（★ 這次稽核後更有力了）**：★ ★ 「你以為你改完了的時候，通常還有三分之一沒改到。」
+> ★ ★ 而且——★ ★ **連你自己寫的驗證工具都會算錯**。★ ★ 這次是重複計數，★ ★ 上次是漏掉帶後綴的 class。
+> ★ ★ ★ **AI 給你的數字看起來很像真的，★ ★ 你要問它怎麼算出來的。**
+
 ### 1.1 全站（`src/` 全部 53 個檔案，剝除 `style.css` 的 token 定義）
 
 | 徵兆 | 改前 | 改後 |
@@ -57,9 +94,11 @@
 | `drop-shadow-` 彩色陰影 | 1 | **0** |
 | **emoji** | **153 處／66 種** | **0 處／0 種** |
 
-> ★ 改後仍留 **8 處 `rounded-full`**，全部是**圓形圖形元件**，不是矩形容器：
-> HUD 血條槽＋填充（4）、HUD 經驗條槽＋填充（2）、王血條槽（1）、手機搖桿底盤（1）。
+> ★ 改後仍留 **`rounded-full`**：**原始碼 8 處 / 渲染後 DOM 6 處**，★ 全部是**圓形圖形元件**，不是矩形容器：
+> HUD 血條槽＋填充（2）、HUD 經驗條槽＋填充（2）、手機搖桿底盤（1）、手機跳躍鈕（1）＝ 6 處（DOM）；
+> 另王血條槽＋外框（2）＝原始碼 8 處，因 `v-if="stats.bossActive"` 平時不渲染。
 > 依 `TOKENS.md` §4，這是明列的合法例外；**改前的 46 處中有 46 處是容器**（按鈕、輸入框、卡片、徽章），已全數清零。
+> ★ 口徑細節見 §1.0.5。
 
 ### 1.2 首頁（渲染後 DOM）
 
@@ -272,6 +311,16 @@
 | `unslop/shoot-game.mjs` | 從**線上版**自動玩進遊戲內截圖（hero 素材來源，過期時重跑即可） |
 | `unslop/shoot-after.mjs` | 對**本機版**截首頁與遊戲內畫面（需先 `pnpm build` 並起 preview） |
 | `unslop/snap-hud.mjs` | 擷取遊戲內 HUD 的 DOM（slop 掃描用） |
+| `unslop/audit-dom.mjs` | ★ **全站稽核**：走訪 10 個畫面，逐元素讀 `class` token 精確比對，全域去重後產出最終數字 |
+
+重跑全站稽核（★ 這才是最終數字的來源，★ ★ 不是 grep）：
+
+```bash
+cd ~/.openclaw/workspace/chiaqian/zombie-survivors
+pnpm build
+npx vite preview --port 4173 &
+node unslop/audit-dom.mjs        # → unslop/audit-dom.json
+```
 
 重跑 hero 素材（遊戲更新後）：
 

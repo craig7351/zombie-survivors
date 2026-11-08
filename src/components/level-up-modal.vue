@@ -2,8 +2,12 @@
   <div class="absolute inset-0 z-20 flex items-center justify-center bg-surface-2">
     <div class="w-[min(92vw,40rem)] rounded-2xl bg-surface-1 p-6 text-text-primary shadow-[0_8px_24px_rgba(0,0,0,0.45)] border border-hairline">
       <div class="mb-4 text-center">
-        <div class="text-sm font-medium" :class="isChoice ? 'text-caution' : 'text-accent'">
-          {{ isChoice ? '祝福 / 詛咒' : `升級！ LV ${level}` }}
+        <!-- Signature：警戒條紋壓在標題左側 4px 豎條 -->
+        <div class="mb-2 flex items-center justify-center gap-2">
+          <span class="warn-stripe h-4 w-1 shrink-0" aria-hidden="true" />
+          <span class="text-sm font-medium" :class="isChoice ? 'text-caution' : 'text-accent'">
+            {{ isChoice ? '祝福 / 詛咒' : `升級！ LV ${level}` }}
+          </span>
         </div>
         <div class="text-lg font-medium">{{ isChoice ? '二選一（有得有失）' : '選擇一項強化' }}</div>
       </div>
