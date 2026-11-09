@@ -29,6 +29,12 @@ const MARKERS = [
   "gradient-to",
 ];
 
+/** ★ 第二組掃描：★ inline / computed style 層的漸層
+ *  ★ 第一版只讀 class attribute，★ 對 :style="{ background: 'linear-gradient(...)' }"
+ *  ★ 完全看不到 —— 那是工具盲區，不是事實。★ 這裡改用 getComputedStyle 掃，
+ *  ★ 並把每個漸層元素連同其 class / 文字摘要一起輸出，★ 供人工判定合法與否。 */
+const GRADIENT_RE = /gradient\(/i;
+
 /** 以 CSS class token 精確比對（token 完全相等，不是子字串） */
 function countTokens(classAttr, token) {
   const classes = classAttr.split(/\s+/).filter(Boolean);
@@ -60,11 +66,12 @@ for (const label of ["關閉", "知道了，開玩！"]) {
 
 /** 掃描當前畫面：收集根節點內所有元素的 class token */
 async function scanCurrent(label) {
-  const data = await page.evaluate((markers) => {
+  const data = await page.evaluate(({ markers, gradientRe }) => {
     const counts = Object.fromEntries(markers.map((m) => [m, 0]));
     const emoji = [];
+    const gradients = [];
     const root = document.querySelector("#app");
-    if (!root) return { counts, emoji, total: 0 };
+    if (!root) return { counts, emoji, gradients, total: 0 };
     // 全域去重：HUD 在 game-view 常駐掛載，切到 pause-menu 時仍在 DOM 裡，
     // 不去重會把同一批元素數兩次（這正是教材要講的坑）
     window.__auditSeen = window.__auditSeen || new Set();
@@ -93,6 +100,22 @@ async function scanCurrent(label) {
           }
         }
       }
+      // ★ computed style 層的漸層（★ class token 看不到的那一層）
+      if (isNew) {
+        const cs = getComputedStyle(el);
+        const bi = cs.backgroundImage || "";
+        const bb = cs.background || "";
+        const gRe = new RegExp(gradientRe, "i");
+        if (gRe.test(bi) || gRe.test(bb)) {
+          gradients.push({
+            tag: el.tagName.toLowerCase(),
+            cls: (el.getAttribute("class") || "").split(/\s+/).filter(Boolean).slice(0, 4).join(" "),
+            inline: el.getAttribute("style") ? el.getAttribute("style").slice(0, 120) : "",
+            computed: (bi || bb).slice(0, 120),
+            text: (el.textContent || "").trim().slice(0, 24),
+          });
+        }
+      }
       // 文字節點的 emoji
       for (const node of el.childNodes) {
         if (node.nodeType === 3 && isNew) {
@@ -111,8 +134,8 @@ async function scanCurrent(label) {
         }
       }
     }
-    return { counts, emoji, total: all.length, fresh };
-  }, MARKERS);
+    return { counts, emoji, gradients, total: all.length, fresh };
+  }, { markers: MARKERS, gradientRe: GRADIENT_RE.source });
   return { label, ...data };
 }
 
@@ -230,5 +253,53 @@ for (const m of MARKERS) console.log(`  ${m.padEnd(18)} ${totals[m]}`);
 console.log(`  ${"emoji".padEnd(18)} ${emojiTotal} 處 / ${emojiKinds.size} 種`);
 console.log(`  ${"畫面數".padEnd(18)} ${results.length}`);
 
-writeFileSync(`${OUT}/audit-dom.json`, JSON.stringify({ results, totals, emojiTotal, emojiKinds: [...emojiKinds] }, null, 2), "utf8");
+/* ★ 漸層（★ computed style 層）★ —— ★ class token 口徑看不到的那一層
+ *  ★ ★ 關鍵：★ DOM 實例數 ≠ 原始碼定義數。
+ *  ★ background-polygons 在每個畫面都會重建，★ 所以 DOM 裡會出現十幾個「實例」，
+ *  ★ 但原始碼只有 2 處定義。★ 教材要給學生能 grep 對上的數字，★ 這裡必須去重到「定義」。 */
+const allGradientInstances = [];
+for (const r of results) {
+  for (const g of r.gradients || []) allGradientInstances.push({ 畫面: r.label, ...g });
+}
+/* 去重鍵：tag + class + computed 值 —— 同一個定義在不同畫面只算一次 */
+const gradientDefs = new Map();
+for (const g of allGradientInstances) {
+  const key = `${g.tag}|${g.cls}|${g.computed}`;
+  if (!gradientDefs.has(key)) gradientDefs.set(key, { ...g, 出現場面: [g.畫面] });
+  else gradientDefs.get(key).出現場面.push(g.畫面);
+}
+console.log(
+  `\n=== 漸層（computed style）===\n  DOM 實例 ${allGradientInstances.length} 處 → 去重後定義 ${gradientDefs.size} 處`
+);
+let gi = 0;
+for (const g of gradientDefs.values()) {
+  gi++;
+  console.log(
+    `  [${gi}] <${g.tag} class="${g.cls}">  ${g.text ? "文字:" + g.text + "  " : ""}${g.computed}`
+  );
+  console.log(`      出現場面: ${g.出現場面.join(", ")}`);
+}
+if (!gradientDefs.size) console.log("  （無）");
+
+writeFileSync(
+  `${OUT}/audit-dom.json`,
+  JSON.stringify(
+    {
+      results,
+      totals,
+      emojiTotal,
+      emojiKinds: [...emojiKinds],
+      gradientInstances: allGradientInstances,
+      gradientDefinitions: [...gradientDefs.values()].map((g) => ({
+        tag: g.tag,
+        cls: g.cls,
+        computed: g.computed,
+        出現場面: g.出現場面,
+      })),
+    },
+    null,
+    2
+  ),
+  "utf8"
+);
 console.log("\n→ unslop/audit-dom.json");

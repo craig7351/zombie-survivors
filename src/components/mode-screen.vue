@@ -62,11 +62,12 @@ const emit = defineEmits<{ (e: 'select', mode: GameMode): void; (e: 'back'): voi
 .mode-card:active {
   transform: scale(0.98);
 }
+/* 死鬥模式：平面 danger 半透明（不用漸層疊色） */
 .mode-card--dm {
-  background: linear-gradient(180deg, rgba(220, 60, 60, 0.28), rgba(120, 20, 20, 0.28));
-  border-color: rgba(255, 120, 120, 0.5);
+  background: color-mix(in srgb, var(--color-danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--color-danger) 50%, transparent);
 }
 .mode-card--dm:hover {
-  background: linear-gradient(180deg, rgba(240, 80, 80, 0.4), rgba(140, 30, 30, 0.4));
+  background: color-mix(in srgb, var(--color-danger) 28%, transparent);
 }
 </style>

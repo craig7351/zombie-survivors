@@ -21,6 +21,15 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "span",
+          "cls": "warn-stripe absolute top-0 left-0",
+          "inline": "",
+          "computed": "repeating-linear-gradient(45deg, rgb(240, 196, 25) 0px, rgb(240, 196, 25) 8px, rgb(22, 25, 26) 8px, rgb(22, 25, 26) 16px",
+          "text": ""
+        }
+      ],
       "total": 58,
       "fresh": 58
     },
@@ -45,6 +54,22 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "div",
+          "cls": "absolute inset-0 overflow-hidden",
+          "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+          "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "cls": "absolute inset-0",
+          "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+          "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+          "text": ""
+        }
+      ],
       "total": 55,
       "fresh": 55
     },
@@ -69,6 +94,22 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "div",
+          "cls": "absolute inset-0 overflow-hidden",
+          "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+          "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "cls": "absolute inset-0",
+          "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+          "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+          "text": ""
+        }
+      ],
       "total": 132,
       "fresh": 132
     },
@@ -93,6 +134,22 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "div",
+          "cls": "absolute inset-0 overflow-hidden",
+          "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+          "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "cls": "absolute inset-0",
+          "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+          "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+          "text": ""
+        }
+      ],
       "total": 41,
       "fresh": 41
     },
@@ -117,6 +174,22 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "div",
+          "cls": "absolute inset-0 overflow-hidden",
+          "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+          "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "cls": "absolute inset-0",
+          "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+          "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+          "text": ""
+        }
+      ],
       "total": 47,
       "fresh": 47
     },
@@ -141,6 +214,22 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "div",
+          "cls": "absolute inset-0 overflow-hidden",
+          "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+          "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "cls": "absolute inset-0",
+          "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+          "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+          "text": ""
+        }
+      ],
       "total": 46,
       "fresh": 46
     },
@@ -165,6 +254,22 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [
+        {
+          "tag": "div",
+          "cls": "absolute inset-0 overflow-hidden",
+          "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+          "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "cls": "absolute inset-0",
+          "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+          "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+          "text": ""
+        }
+      ],
       "total": 82,
       "fresh": 82
     },
@@ -189,6 +294,7 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [],
       "total": 132,
       "fresh": 132
     },
@@ -213,6 +319,7 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [],
       "total": 47,
       "fresh": 47
     },
@@ -237,6 +344,7 @@
         "gradient-to": 0
       },
       "emoji": [],
+      "gradients": [],
       "total": 54,
       "fresh": 7
     }
@@ -260,5 +368,147 @@
     "gradient-to": 0
   },
   "emojiTotal": 0,
-  "emojiKinds": []
+  "emojiKinds": [],
+  "gradientInstances": [
+    {
+      "畫面": "landing",
+      "tag": "span",
+      "cls": "warn-stripe absolute top-0 left-0",
+      "inline": "",
+      "computed": "repeating-linear-gradient(45deg, rgb(240, 196, 25) 0px, rgb(240, 196, 25) 8px, rgb(22, 25, 26) 8px, rgb(22, 25, 26) 16px",
+      "text": ""
+    },
+    {
+      "畫面": "leaderboard",
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "leaderboard",
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "bestiary",
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "bestiary",
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "messages",
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "messages",
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "onlineHistory",
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "onlineHistory",
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "mode",
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "mode",
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "difficulty",
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "inline": "background: linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%);",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "text": ""
+    },
+    {
+      "畫面": "difficulty",
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "inline": "background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55) 100%);",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "text": ""
+    }
+  ],
+  "gradientDefinitions": [
+    {
+      "tag": "span",
+      "cls": "warn-stripe absolute top-0 left-0",
+      "computed": "repeating-linear-gradient(45deg, rgb(240, 196, 25) 0px, rgb(240, 196, 25) 8px, rgb(22, 25, 26) 8px, rgb(22, 25, 26) 16px",
+      "出現場面": [
+        "landing"
+      ]
+    },
+    {
+      "tag": "div",
+      "cls": "absolute inset-0 overflow-hidden",
+      "computed": "linear-gradient(160deg, rgb(10, 15, 10) 0%, rgb(20, 32, 22) 45%, rgb(12, 17, 24) 100%)",
+      "出現場面": [
+        "leaderboard",
+        "bestiary",
+        "messages",
+        "onlineHistory",
+        "mode",
+        "difficulty"
+      ]
+    },
+    {
+      "tag": "div",
+      "cls": "absolute inset-0",
+      "computed": "radial-gradient(rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%)",
+      "出現場面": [
+        "leaderboard",
+        "bestiary",
+        "messages",
+        "onlineHistory",
+        "mode",
+        "difficulty"
+      ]
+    }
+  ]
 }

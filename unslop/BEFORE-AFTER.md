@@ -33,18 +33,24 @@
 
 | 面向 | 做法 |
 |---|---|
-| **什麼算「一處」** | **子字串比對**。`backdrop-blur-md`、`backdrop-blur-sm`、`backdrop-blur` 都各算一處。 |
+| **★ 兩層口徑（★ 必須分開講，★ ★ 否則數字會打架）★** | ★ **第一層：原始碼掃描**（★ 拿來報「改前 → 改後」★ 對照表）★ —— ★ 用**子字串比對**，★ `backdrop-blur-md`／`backdrop-blur-sm`／`backdrop-blur` 各算一處。<br>★ **第二層：渲染後 DOM 稽核**（★ 拿來報「最終驗收」★ 數字）★ —— ★ 用**精確 token 比對**（★ class token 完全等於 `backdrop-blur` 才算），★ ★ 並額外掃 `getComputedStyle` 的漸層。<br>★ ★ 兩層數字本來就會不同（★ 原始碼 8 處 `rounded-full` vs DOM 6 處），★ ★ **這不是矛盾，是視角不同**；★ ★ ★ 教材引用時一定要講明用的是哪一層。 |
+| **原始碼層：一處怎麼算** | **子字串比對**。`backdrop-blur-md`、`backdrop-blur-sm`、`backdrop-blur` 都各算一處。 |
 | **為什麼不用 token 精確比對** | 若比對「class token 完全等於 `backdrop-blur`」，帶後綴的 `backdrop-blur-md` 會被整批漏掉——而全站幾乎都是帶後綴的寫法。**本專案第一輪就踩過這個坑**：口徑錯誤導致「首頁＋HUD 清零」的表象下，全站其實還剩 32 處。 |
 | **全站口徑** | `src/` 全部 .vue/.ts/.css（53 檔），但**剝除 `style.css` 的 `@theme` 區塊**（那是 token 定義本身，不是使用處）。 |
-| **改前基線怎麼來** | `git archive 3d538d6 src` 取出原始碼實測，不靠印象、不靠手數。 |
-| **emoji 口徑** | 完整 emoji 區段（U+1F300–1FAFF、U+2600–27BF、U+2B00–2BFF、U+FE0F 等）。純 ASCII 箭頭 `→` 屬數學/排版符號，**不算 emoji**——改後殘留的 19 處 `→` 全在程式註解裡，實質 emoji = 0。 |
+| **改前基線怎麼來** | `git archive 3d538d6 src` 取出原始碼實測，不靠印象、不靠手數。<br>★ ★ 順帶一提：★ 用 `7358a0e`（再前一個 commit）做基線，★ ★ slop 數字**完全相同**（48/90/14/46/5/8/1/5/3/1），★ ★ 因為那兩個 commit 之間沒動到介面。★ ★ 教材統一寫 **`3d538d6`**（★ ★ 線上 v2.0 對齊的那一版）。 |
+| **檔案數** | ★ 改前基線 `3d538d6` 的 `src/` = **51 檔**（19 vue + 31 ts + 1 css）；★ ★ 改後工作區 = **53 檔**（★ ★ 新增 `src/ui/icons.ts` 圖示登錄表 ＋ `src/game/extra-weapons.ts`）。★ ★ 掃描時兩個基線要對齊，★ ★ 否則「檔案數不同」會被誤讀成數字不可比。 |
+| **emoji 口徑** | 下列 Unicode 區段的**聯集**（★ 這組區段重現出的正好是 153 處／66 種，★ ★ 可直接照抄驗證）：<br>`U+1F000–U+1FAFF`（含 1F1E6–1F1FF 國旗）、`U+2190–U+21FF`（↑↓←→ 與 🔀🔁 等）、`U+2300–U+23FF`（⌚⌛ 等）、`U+24C2–U+24FF`（Ⓜ 等）、`U+25A0–U+27BF`（▲●■ 等）、`U+2B00–U+2BFF`（⬆⬇ 等）、`U+FE0F`（變體選擇符）<br>★ **這個口徑包含 `←` `→` `▸` `✕` `⚠` 等符號**——★ ★ 它們不是 emoji，★ ★ 但在 AI 生成的介面裡確實被當圖示亂用，★ ★ 所以教材把它們一起算進「要清掉的符號垃圾」是合理的。<br>★ 若只想嚴格算 emoji（不含箭頭與幾何符號），★ ★ 改用 `U+1F300–U+1FAFF` 單一區段 = **85 處／46 種**，★ ★ 數字同樣成立。<br>★ 純 ASCII 箭頭 `→`（U+2192）落在 `U+2190–U+21FF`，★ ★ 故改後殘留的 19 處 `→` 全在程式註解裡，★ ★ **實質 emoji = 0**。 |
 
 > ★ 這段「計數口徑」本身就是教材價值最高的段落：**掃描工具寫錯，數字就會說謊，而且看起來很像真的。**
 
-### 1.0.5 ★ 最終稽核：渲染後 DOM 全站逐畫面實測
+### 1.0.5 ★ 最終稽核：渲染後 DOM 全站逐畫面實測（★ class token ＋ computed style 雙層）
 
 ★ 小關要求「每個 component 改完用渲染後 DOM 驗，不看原始碼 grep」——★ 這是本專案最嚴格也最該做的一步。
-★ 稽核腳本：`unslop/audit-dom.mjs`（Playwright 走訪 10 個畫面，★ ★ 逐元素讀 `class` token 精確比對）
+★ 稽核腳本：`unslop/audit-dom.mjs`（Playwright 走訪 10 個畫面）。
+★ ★ **掃描分兩層，缺一不可：**
+★ 1. **class token 層** —— ★ 逐元素讀 `class` 屬性，★ **精確 token 比對**（token 完全相等才算命中）。
+★ 2. **computed style 層** —— ★ 逐元素讀 `getComputedStyle(el).backgroundImage` ／ `background`，★ ★ 抓 **inline `:style` 與 `<style>` 區塊裡的漸層**。
+★ ★ **★ 為什麼第 2 層不能省：★ ★ 第一版稽核只讀 `class` 屬性，★ ★ 於是 `:style="{ background: 'linear-gradient(...)' }"` 這種寫法**完全不在掃描範圍內** —— ★ 難度選擇頁那張卡片的漸層**真的會渲染**，★ ★ 但腳本看不見。★ ★ ★ 這是**工具盲區，不是事實**：★ ★ 「渲染後 DOM = 0」★ ★ 會變成一句**自己騙自己的話**。
 
 | 畫面 | 元素數 | emoji | slop 徵兆 |
 |---|---:|---:|---|
@@ -64,7 +70,40 @@
 ★ `tracking-widest` / `tracking-wider` / `animate-ping` / `text-shadow` / `drop-shadow` /
 ★ `bg-black/*` / `ring-1` / `ring-2` / `shadow-2xl` / `gradient-to` / emoji —— ★ ★ **渲染後 DOM 實測全部為 0**。
 
-★ ★ ★ **這一次稽核又抓到兩個「原始碼掃描看不到」的問題**，★ ★ 值得單獨列出：
+★ **漸層（computed style 層）★ 稽核輸出：**
+```
+=== 漸層（computed style）===
+  DOM 實例 13 處 → 去重後定義 3 處
+  [1] <span class="warn-stripe absolute top-0 left-0">  repeating-linear-gradient(45deg, ...)
+      出現場面: landing
+  [2] <div class="absolute inset-0 overflow-hidden">  linear-gradient(160deg, ...)
+      出現場面: leaderboard, bestiary, messages, onlineHistory, mode, difficulty
+  [3] <div class="absolute inset-0">  radial-gradient(rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)
+      出現場面: leaderboard, bestiary, messages, onlineHistory, mode, difficulty
+```
+★ ★ **這裡又有第二個坑：DOM 實例 13 ≠ 定義 3。** ★ ★ `background-polygons` 會在**每一個畫面**重建，★ ★ 所以同一份漸層在 DOM 裡出現十幾次；★ ★ 但原始碼只有 **3 處定義**。
+★ ★ 教材要給學生能照著 grep 對上的數字，★ ★ 所以稽核腳本把**實例去重回定義**（去重鍵 = tag + class + computed 值）。
+
+#### 漸層合法例外（★ 全站僅此 3 處，★ 全部是 Signature）
+
+| # | 位置 | 寫法 | 為何合法 |
+|---|---|---|---|
+| 1 | `src/style.css:86` | `.warn-stripe { background-image: repeating-linear-gradient(45deg, …) }` | ★ **Signature 本體** —— ★ 4px 黑黃警戒條紋，全站唯一的個性記號 |
+| 2 | `src/components/background-polygons.vue:29` | `linear-gradient(160deg, #0a0f0a 0%, #142016 45%, #0c1118 100%)` | ★ **Signature 背景藝術** —— ★ 廢墟天空的縱深，★ 屬情境美術而非 UI 裝飾 |
+| 3 | `src/components/background-polygons.vue:10` | `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)` | ★ 同上 —— ★ 四周壓暗的暈影，★ 屬背景美術 |
+
+★ ★ **改前基線 `3d538d6` 的 inline 漸層共 8 處**（background-polygons 2、landing-screen 3、difficulty-screen 1、mode-screen 2）。
+★ ★ 其中 **3 處是真正該清的 slop**，★ ★ 已在第二輪改造中改掉：
+
+| 位置 | 改前 | 改後 | 為什麼這樣改 |
+|---|---|---|---|
+| `difficulty-screen.vue:21` | `linear-gradient(90deg, ${d.color}22, rgba(255,255,255,0.05))` | ★ `background: ${d.color}1a` ＋ `borderLeft: 3px solid ${d.color}` | ★ 漸層改成**平面半透明 ＋ 3px 左側色條** —— ★ ★ 色碼仍取自難度設定，★ ★ 但不再用漸層假裝立體 |
+| `mode-screen.vue:66` | `linear-gradient(180deg, rgba(220,60,60,.28), rgba(120,20,20,.28))` | ★ `color-mix(in srgb, var(--color-danger) 18%, transparent)` | ★ 改成**以 token 色平面混合** —— ★ ★ 不再硬寫 rgba，★ ★ 色彩回到 token 表 |
+| `mode-screen.vue:70` | `linear-gradient(180deg, rgba(240,80,80,.4), rgba(140,30,30,.4))` | ★ `color-mix(in srgb, var(--color-danger) 28%, transparent)` | ★ 同上，★ hover 態只改混合比例 |
+
+★ ★ **「漸層一律不能用」不是本教材的規則。** ★ ★ 規則是：**UI 容器與卡片不得用漸層製造假深度**；★ ★ **背景美術與 Signature 可以用**。★ ★ ★ 教材最怕的是把「我清掉的」寫成「不該有的」——★ ★ ★ 那會讓學生去拆掉該留的東西。
+
+★ ★ ★ **這一次稽核抓到三個「原始碼掃描看不到」的問題**，★ ★ 值得單獨列出：
 
 **問題一：`rounded-full` 數到 12，但實際只有 6。**
 ★ HUD 在 `game-view` 裡是**常駐掛載**的，★ ★ 切到暫停選單時 HUD 仍在 DOM 裡，★ ★ 不去重就會把同一批元素數兩次。
@@ -72,6 +111,15 @@
 
 **問題二：原始碼 8 處，渲染後 6 處，★ ★ 差在王血條。**
 ★ 王血條是 `v-if="stats.bossActive"`，★ ★ 平時不渲染，★ ★ 所以正常遊玩時 DOM 只有 6 處。
+
+**★ ★ ★ 問題三：★ 「渲染後 DOM = 0 漸層」原本是★ 一句★ ★ ★ 自己騙自己的話。**
+★ 第一版稽核只讀 `class` 屬性，★ ★ inline `:style` 的 `linear-gradient` 完全不在掃描範圍內。
+★ ★ 實際上 `difficulty-screen` 與 `mode-screen` 有 **3 處漸層真的會渲染**，★ ★ 但腳本回報「0」。
+★ ★ 這不是造假，★ ★ **是掃描範圍比宣稱的窄** —— ★ ★ 而「範圍沒講清楚」★ ★ 等於「數字在說謊」。
+★ ★ 修法：第 2 層改用 `getComputedStyle(el).backgroundImage` ／ `.background`，★ ★ ★ 然後**重跑**。
+★ ★ ★ ★ 教材的教學重點因此變得更強：
+> ★ 「★ 連你自己寫的驗證工具都會算錯。★ AI 給你的數字看起來很像真的，你要問它怎麼算出來的。」
+> ★ ★ ★ ★ 而這一句的證據，★ ★ ★ ★ 就在這份教材自己的稽核腳本裡 —— ★ ★ ★ ★ 工具盲區是活的案例，★ ★ ★ ★ 不是修辭。
 ★ ★ **兩個數字都對**，★ ★ 差別是「王是否在場」——★ ★ 這就是為什麼教材的數字必須標明口徑。
 
 > ★ ★ ★ **教材題眼（★ 這次稽核後更有力了）**：★ ★ 「你以為你改完了的時候，通常還有三分之一沒改到。」
@@ -89,7 +137,8 @@
 | `rounded-full` | 46 | **8**（見下方註） |
 | `tracking-widest` / `tracking-wider` | 5 / 8 | **0 / 0** |
 | `animate-ping` 呼吸光點 | 1 | **0** |
-| `gradient-to` 漸層 | 5 | **0** |
+| `gradient-to` 漸層（class） | 5 | **0** |
+| ★ **inline 漸層（★ computed style 層）★** | **8**（★ background-polygons 2、landing-screen 3、difficulty-screen 1、mode-screen 2）★ | **3**（★ 全為 Signature，★ ★ 見下方例外清單）★ |
 | `text-shadow` 假陰影 | 3 | **0** |
 | `drop-shadow-` 彩色陰影 | 1 | **0** |
 | **emoji** | **153 處／66 種** | **0 處／0 種** |
@@ -311,7 +360,7 @@
 | `unslop/shoot-game.mjs` | 從**線上版**自動玩進遊戲內截圖（hero 素材來源，過期時重跑即可） |
 | `unslop/shoot-after.mjs` | 對**本機版**截首頁與遊戲內畫面（需先 `pnpm build` 並起 preview） |
 | `unslop/snap-hud.mjs` | 擷取遊戲內 HUD 的 DOM（slop 掃描用） |
-| `unslop/audit-dom.mjs` | ★ **全站稽核**：走訪 10 個畫面，逐元素讀 `class` token 精確比對，全域去重後產出最終數字 |
+| `unslop/audit-dom.mjs` | ★ **全站稽核**：走訪 10 個畫面，★ ★ **雙層掃描**（class token 精確比對 ＋ `getComputedStyle` 漸層掃描），★ ★ 全域去重、漸層再去重回「定義數」，★ ★ 產出最終數字 |
 
 重跑全站稽核（★ 這才是最終數字的來源，★ ★ 不是 grep）：
 
@@ -320,6 +369,19 @@ cd ~/.openclaw/workspace/chiaqian/zombie-survivors
 pnpm build
 npx vite preview --port 4173 &
 node unslop/audit-dom.mjs        # → unslop/audit-dom.json
+```
+
+★ **★ 預期輸出（★ ★ 這是本教材的最終驗收基準，★ ★ 每次改完都該重跑並比對）：★**
+
+```
+=== 渲染後 DOM 全站稽核（逐畫面實測）===
+  ... 10 個畫面 ...
+  全站合計：slop 徵兆全 0、rounded-full 6、emoji 0 處／0 種
+=== 漸層（computed style）===
+  DOM 實例 13 處 → 去重後定義 3 處
+  [1] warn-stripe  repeating-linear-gradient   （Signature）
+  [2] background-polygons linear-gradient       （Signature）
+  [3] background-polygons radial-gradient       （Signature）
 ```
 
 重跑 hero 素材（遊戲更新後）：
@@ -338,7 +400,10 @@ cp unslop/gameplay-1.png public/hero-gameplay.png
 
 2. **先把系統定死，再改畫面。** 而且要**掃全站**——你以為改完了的時候，通常還有三分之一沒改到。
 
-3. **乾淨不等於完成。** 把 slop 全部清掉，得到的會是「灰底＋Inter＋一顆按鈕」——那還是模板。最後一頁必須是**只有這個產品才可能有**的畫面：這裡是那條 4px 警戒條紋，和右欄那張真的實機畫面。
+3. **乾淨不等於完成。** 把 slop 全部清掉，得到的會是「灰底＋Inter＋一顆按鈕」——那還是模板。最後一頁必須是**只有這個產品才可能有**的畫面：這
+
+4. ★ ★ **連你自己寫的驗證工具都會算錯。** ★ ★ AI 給你的數字看起來很像真的，你要問它**怎麼算出來的**。
+   ★ ★ 這份教材自己的稽核腳本就翻了兩次車：★ ★ 第一次只讀 `class` 屬性，看不見 inline `:style` 的漸層，★ ★ **回報「0」但畫面明明有漸層**；★ ★ 第二次去重沒做，★ ★ 同一批 HUD 元素被數了兩次，★ ★ **`rounded-full` 報 12 實際只有 6**。★ ★ ★ 修完再重跑，★ ★ ★ 數字才會變成你敢寫進講義的數字。裡是那條 4px 警戒條紋，和右欄那張真的實機畫面。
 
 ---
 

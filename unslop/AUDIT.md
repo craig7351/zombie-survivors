@@ -42,6 +42,7 @@
 | `tracking-widest` / `tracking-wider` | 5 / 8 | **0 / 0** |
 | `animate-ping` | 1 | **0** |
 | `gradient-to` | 5 | **0** |
+| ★ inline 漸層（★ computed style 層）★ | **8** | **3**（★ 全為 Signature 合法例外）★ |
 | `text-shadow` | 3 | **0** |
 | `drop-shadow-` | 1 | **0** |
 | emoji | **153 處、66 種** | **0 處、0 種** |

@@ -48,6 +48,7 @@
 
 - ❌ `backdrop-blur`（玻璃卡片）—— 全站 0 處（實測：改前 48 處 → 改後 0 處，含 style 區塊的 `backdrop-filter` 寫法 2 處 → 0）
 - ❌ 漸層文字、漸層底、漸層按鈕
+  ★ **（★ 唯一例外：★ Signature 與背景藝術。★ 全站僅 3 處 —— `.warn-stripe` 的 `repeating-linear-gradient`、★ `background-polygons.vue` 的天空 `linear-gradient` 與壓暗 `radial-gradient`。★ 规则是「★ UI 容器與卡片不得用漸層製造假深度」，★ ★ 不是「漸層一律禁止」。★ 稽核口徑見 `BEFORE-AFTER.md` §1.0.5。）**
 - ❌ 彩色 glow / drop-shadow / 彩色陰影
 - ❌ 徑向色彩洗場、模糊色塊
 - ❌ 多於一個 accent 同時當主色

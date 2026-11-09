@@ -18,7 +18,7 @@
           v-for="d in difficulties"
           :key="d.id"
           class="flex items-center gap-4 rounded-2xl p-4 text-left border border-hairline transition hover:scale-[1.02]"
-          :style="{ background: `linear-gradient(90deg, ${d.color}22, rgba(255,255,255,0.05))` }"
+          :style="{ background: `${d.color}1a`, borderLeft: `3px solid ${d.color}` }"
           @click="emit('select', d.id)"
         >
           <game-icon :name="d.icon" :size="22" class="text-text-secondary" />
