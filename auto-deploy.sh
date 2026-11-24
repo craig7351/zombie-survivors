@@ -9,8 +9,12 @@
 #
 # 憑證：~/Library/Preferences/.wrangler/config/default.toml (Cloudflare OAuth token)
 #
-# 用法：./auto-deploy.sh          檢查並在需要時部署
+# 用法：./auto-deploy.sh          檢查並在需要時部署（冪等，無變更則跳過）
 #        ./auto-deploy.sh --force  不管 HEAD 是否相同都重新部署
+#
+# ★ 本支是本專案「唯一的部署入口」。
+#   原本另有 deploy-pages.sh（無冪等判斷、每次都建置部署），功能已被本支完全涵蓋
+#   （--force 即為強制部署），已移除，避免兩套邏輯分歧。
 
 set -uo pipefail
 
@@ -52,7 +56,7 @@ log "▶ 線上最新部署 commit = ${DEPLOYED_SHA:-<查無>}"
 # 若有未 commit 改動就提醒；想立刻上線請手動跑 deploy-pages.sh。
 if [ -n "$(git status --porcelain -- src public functions index.html package.json vite.config.ts wrangler.jsonc 2>/dev/null | head -1)" ]; then
   log "⚠ 工作區有未 commit 的改動，本次自動部署只含已 commit 的內容。"
-  log "  想把當下未 commit 的改動立即上線，請手動執行：./deploy-pages.sh"
+  log "  想把當下未 commit 的改動立即上線，請手動執行：./auto-deploy.sh --force"
 fi
 
 if [ "$FORCE" != "--force" ] && [ -n "$DEPLOYED_SHA" ] && [ "$DEPLOYED_SHA" = "$HEAD_SHA" ]; then
