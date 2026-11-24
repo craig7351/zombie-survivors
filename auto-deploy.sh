@@ -48,6 +48,13 @@ if prod:
 
 log "▶ 線上最新部署 commit = ${DEPLOYED_SHA:-<查無>}"
 
+# 未 commit 的改動不會自動上線（避免半成品被自動推到正式站）。
+# 若有未 commit 改動就提醒；想立刻上線請手動跑 deploy-pages.sh。
+if [ -n "$(git status --porcelain -- src public functions index.html package.json vite.config.ts wrangler.jsonc 2>/dev/null | head -1)" ]; then
+  log "⚠ 工作區有未 commit 的改動，本次自動部署只含已 commit 的內容。"
+  log "  想把當下未 commit 的改動立即上線，請手動執行：./deploy-pages.sh"
+fi
+
 if [ "$FORCE" != "--force" ] && [ -n "$DEPLOYED_SHA" ] && [ "$DEPLOYED_SHA" = "$HEAD_SHA" ]; then
   log "✓ HEAD 與線上一致（$HEAD_SHA），無需部署。"
   exit 0
