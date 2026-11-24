@@ -27,8 +27,21 @@ FORCE="${1:-}"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
+# 解析 wrangler 執行方式。
+# 本機 wrangler 目前裝在 ~/.hermes/node/lib/node_modules/（非本專案 node_modules，
+# 且不在 PATH 內），靠 npx 的全域 bin 探查解析得到。
+# 若該 node 環境被重裝/升級而 wrangler 不在，npx --no-install 會直接失敗、
+# 整支部署排程就此死掉。因此保留 npx wrangler 作為後援，讓 npx 自動補下載。
+if npx --no-install wrangler --version >/dev/null 2>&1; then
+  WRANGLER="npx --no-install wrangler"
+else
+  WRANGLER="npx wrangler"
+  log "⚠ 本機 wrangler 不可用，改用 npx wrangler（首次會自動下載，耗時較久）。"
+fi
+wrangler() { $WRANGLER "$@"; }
+
 log "▶ 檢查 Cloudflare 登入狀態..."
-if ! npx --no-install wrangler whoami 2>&1 | grep -q "You are logged in"; then
+if ! wrangler whoami 2>&1 | grep -q "You are logged in"; then
   log "✗ 未登入 Cloudflare。請執行：npx wrangler login"
   exit 1
 fi
@@ -37,7 +50,7 @@ HEAD_SHA=$(git rev-parse --short HEAD)
 log "▶ 本機 HEAD = $HEAD_SHA"
 
 # 取 Cloudflare 最新 production 部署對應的 commit
-DEPLOYED_SHA=$(npx --no-install wrangler pages deployment list \
+DEPLOYED_SHA=$(wrangler pages deployment list \
   --project-name "$PROJECT" --json 2>/dev/null \
   | python3 -c "
 import sys, json
@@ -75,6 +88,6 @@ if ! npm run build; then
 fi
 
 log "▶ 部署到 Cloudflare Pages（專案：$PROJECT，branch：$BRANCH）..."
-npx --no-install wrangler pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" --commit-dirty=true
+wrangler pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" --commit-dirty=true
 
 log "✓ 部署完成：https://$PROJECT-9r7.pages.dev/"
