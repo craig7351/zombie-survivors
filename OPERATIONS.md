@@ -65,7 +65,21 @@ cd ~/.openclaw/workspace/chiaqian/zombie-survivors
 3. **未 commit 改動警告** —— 預設只部署已 commit 的內容，避免半成品被自動推上正式站；
    想立刻上線當下未 commit 的內容，用 `--force`。
 
-### 驗收
+### 部署後自動驗收（腳本內建）
+
+`auto-deploy.sh` 部署完成後**不會只看 wrangler 有沒有回 0**，而是逐一確認：
+
+1. **deployment id 確實換新** —— 部署前記下當下 production deployment id，部署後再取一次；
+   兩者相同 = 部署沒生效 → `exit 1`。
+   （欄位名是 **`Id`**，不是 `id` —— 寫錯會讓腳本誤判失敗。這個坑踩過一次。）
+2. **線上首頁 HTTP 200** —— 不過 → `exit 1`。
+3. **`/api/stats` 的 content-type 是 `application/json`** —— 不過 → `exit 1`。
+
+★ **exit code 也是一種未經校準的判準**：它只綁定「指令送達」，不綁定「目標狀態真的達成」。
+（Hermes 重啟踩過同款坑：`launchctl kickstart` 回 0，但新行程撞 single-instance 鎖自己退了。）
+**沒有經過反向驗證的成功判準，都是猜的。**
+
+### 手動驗收
 
 ```bash
 curl -s -o /dev/null -w "%{http_code} %{content_type}\n" https://animal-survivors-9r7.pages.dev/

@@ -87,7 +87,62 @@ if ! npm run build; then
   exit 1
 fi
 
+# 部署前記下當下的 production deployment id —— 部署後要確認它「確實換了」，
+# 而不是只看 wrangler 有沒有回 0（§5k：exit code 只是一種未經校準的判準）。
+PREV_DEPLOY_ID=$(wrangler pages deployment list \
+  --project-name "$PROJECT" --json 2>/dev/null \
+  | python3 -c "
+import sys, json
+try:
+    rows = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+prod = [r for r in rows if r.get('Environment') == 'Production']
+print(prod[0].get('Id','') if prod else '')
+" 2>/dev/null)
+
 log "▶ 部署到 Cloudflare Pages（專案：$PROJECT，branch：$BRANCH）..."
-wrangler pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" --commit-dirty=true
+if ! wrangler pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" --commit-dirty=true; then
+  log "✗ 部署指令失敗（線上維持原狀）。"
+  exit 1
+fi
+
+# ★ 部署後驗收：deployment id 必須確實換新，且線上必須真的能服務。
+#   只靠 wrangler 回 0 會踩到「指令送達 ≠ 目標達成」的坑（§5k）。
+POST_DEPLOY_ID=$(wrangler pages deployment list \
+  --project-name "$PROJECT" --json 2>/dev/null \
+  | python3 -c "
+import sys, json
+try:
+    rows = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+prod = [r for r in rows if r.get('Environment') == 'Production']
+print(prod[0].get('Id','') if prod else '')
+" 2>/dev/null)
+
+if [ -z "$POST_DEPLOY_ID" ]; then
+  log "✗ 查不到部署後的 deployment id，無法確認部署生效。"
+  exit 1
+fi
+if [ "$POST_DEPLOY_ID" = "$PREV_DEPLOY_ID" ] && [ -n "$PREV_DEPLOY_ID" ]; then
+  log "✗ deployment id 未變（$POST_DEPLOY_ID），部署可能未生效。"
+  exit 1
+fi
+log "▶ deployment id 已更新：${PREV_DEPLOY_ID:-<無>} → $POST_DEPLOY_ID"
+
+HTTP=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "https://$PROJECT-9r7.pages.dev/" || echo "000")
+STATS_CT=$(curl -s -o /dev/null -w "%{content_type}" -m 20 "https://$PROJECT-9r7.pages.dev/api/stats" || echo "none")
+log "  驗收：首頁 HTTP $HTTP | /api/stats content-type: $STATS_CT"
+
+if [ "$HTTP" != "200" ]; then
+  log "✗ 首頁驗收未過（HTTP $HTTP），請檢查。"
+  exit 1
+fi
+# SPA fallback 會讓不存在路徑也回 200 + text/html，所以 API 必須看 content-type。
+case "$STATS_CT" in
+  application/json*) : ;;
+  *) log "✗ /api/stats content-type 非 JSON（$STATS_CT），請檢查。"; exit 1 ;;
+esac
 
 log "✓ 部署完成：https://$PROJECT-9r7.pages.dev/"
