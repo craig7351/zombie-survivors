@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full overflow-hidden bg-[#0b1020]">
+  <div class="relative w-full h-full overflow-hidden bg-void">
     <canvas ref="canvasRef" class="w-full h-full block outline-none touch-none" />
 
     <hud :stats="stats" />
@@ -7,9 +7,9 @@
     <!-- 死鬥：連殺數（左上角，受擊歸零） -->
     <div
       v-if="stats.mode === 'deathmatch' && stats.combo >= 5 && stats.state === 'running'"
-      class="pointer-events-none absolute left-1/2 top-20 z-10 -translate-x-1/2 text-center font-black text-amber-300 drop-shadow-[0_2px_0_rgba(0,0,0,0.5)]"
+      class="pointer-events-none absolute left-1/2 top-20 z-10 -translate-x-1/2 text-center font-medium text-accent"
     >
-      <span class="text-2xl sm:text-3xl">{{ stats.combo }}</span>
+      <span class="text-lg sm:text-lg">{{ stats.combo }}</span>
       <span class="ml-1 text-sm">連殺</span>
     </div>
 
@@ -18,7 +18,7 @@
       v-if="stats.waveCard && stats.state === 'running'"
       class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
     >
-      <div class="wave-card text-5xl font-black tracking-widest text-lime-300 sm:text-7xl" style="-webkit-text-stroke: 4px #14210f; paint-order: stroke fill">
+      <div class="wave-card text-lg font-medium text-accent sm:text-7xl" style="-webkit-text-stroke: 4px var(--color-void); paint-order: stroke fill">
         {{ stats.waveCard }}
       </div>
     </div>
@@ -26,55 +26,56 @@
     <!-- 右上控制：靜音／暫停／技能等級／Debug -->
     <div v-show="stats.state === 'running'" class="absolute right-3 top-3 z-10 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
       <button
-        class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 bg-black/40 text-base text-white backdrop-blur-md sm:text-xl transition hover:bg-black/60 active:scale-95"
+        class="flex h-9 w-9 items-center justify-center rounded-lg sm:h-11 sm:w-11 bg-surface-1 text-base text-text-primary sm:text-lg transition hover:bg-surface-3 active:scale-95"
         @click="onToggleMute"
       >
-        {{ muted ? '🔇' : '🔊' }}
+        <game-icon :name="muted ? 'mute' : 'sound'" :size="16" />
       </button>
       <select
         v-model="quality"
         @change="onQuality"
         title="畫質"
-        class="h-9 rounded-full border-0 bg-black/40 px-2 text-xs text-white outline-none backdrop-blur-md transition hover:bg-black/60 sm:h-11 sm:px-3 sm:text-sm"
+        class="h-9 rounded-lg border border-hairline bg-surface-1 px-2 text-xs text-text-primary outline-none transition hover:bg-surface-3 sm:h-11 sm:px-3 sm:text-sm"
       >
-        <option v-for="q in qualities" :key="q.id" :value="q.id" class="bg-zinc-900 text-white">🎚 {{ q.name }}畫質</option>
+        <option v-for="q in qualities" :key="q.id" :value="q.id" class="bg-surface-1 text-text-primary">{{ q.name }}畫質</option>
       </select>
       <button
-        class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 bg-black/40 text-base text-white backdrop-blur-md sm:text-xl transition hover:bg-black/60 active:scale-95"
+        class="flex h-9 w-9 items-center justify-center rounded-lg sm:h-11 sm:w-11 bg-surface-1 text-base text-text-primary sm:text-lg transition hover:bg-surface-3 active:scale-95"
         @click="onTogglePause"
       >
-        ⏸
+        <game-icon name="pause" :size="16" />
       </button>
       <button
-        class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 text-base text-white backdrop-blur-md sm:text-xl transition active:scale-95"
-        :class="showStats ? 'bg-cyan-500' : 'bg-black/40 hover:bg-black/60'"
+        class="flex h-9 w-9 items-center justify-center rounded-lg sm:h-11 sm:w-11 text-base text-text-primary sm:text-lg transition active:scale-95"
+        :class="showStats ? 'bg-accent' : 'bg-surface-1 hover:bg-surface-3'"
         @click="onToggleStats"
       >
-        📊
+        <game-icon name="chart" :size="16" />
       </button>
       <button
-        class="flex h-9 w-9 items-center justify-center rounded-full sm:h-11 sm:w-11 text-base text-white backdrop-blur-md sm:text-xl transition active:scale-95"
-        :class="showDebug ? 'bg-fuchsia-500' : 'bg-black/40 hover:bg-black/60'"
+        class="flex h-9 w-9 items-center justify-center rounded-lg sm:h-11 sm:w-11 text-base text-text-primary sm:text-lg transition active:scale-95"
+        :class="showDebug ? 'bg-caution' : 'bg-surface-1 hover:bg-surface-3'"
         @click="onToggleDebug"
       >
-        🛠️
+        <game-icon name="wrench" :size="16" />
       </button>
     </div>
 
     <!-- 技能等級面板 -->
     <div
       v-if="showStats && stats.state === 'running'"
-      class="absolute right-4 top-20 z-20 max-h-[78vh] w-60 overflow-y-auto rounded-2xl bg-black/75 p-3 text-xs text-white shadow-2xl ring-1 ring-white/10 backdrop-blur-md"
+      class="absolute right-4 top-20 z-20 max-h-[78vh] w-60 overflow-y-auto rounded-2xl bg-surface-1 p-3 text-xs text-text-primary shadow-[0_8px_24px_rgba(0,0,0,0.45)] border border-hairline"
     >
-      <div class="mb-2 text-sm font-black text-cyan-300">技能等級</div>
+      <div class="mb-2 text-sm font-medium text-text-secondary">技能等級</div>
       <div
         v-for="(u, i) in upgradeStatus"
         :key="i"
         class="mb-1 flex items-center justify-between"
-        :class="u.level === 0 ? 'text-white/40' : ''"
+        :class="u.level === 0 ? 'text-text-muted' : ''"
       >
-        <span>{{ u.emoji }} {{ u.name }}</span>
-        <span class="font-bold" :class="u.level >= u.maxLevel ? 'text-amber-300' : 'text-white/80'">
+        <game-icon :name="u.icon" :size="14" class="text-text-secondary" />
+          <span>{{ u.name }}</span>
+        <span class="font-medium" :class="u.level >= u.maxLevel ? 'text-accent' : 'text-text-secondary'">
           Lv {{ u.level }}/{{ u.maxLevel }}
         </span>
       </div>
@@ -83,27 +84,27 @@
     <!-- Debug 參數面板 -->
     <div
       v-if="showDebug && stats.state === 'running'"
-      class="absolute right-4 top-20 z-20 max-h-[78vh] w-72 overflow-y-auto rounded-2xl bg-black/75 p-3 text-xs text-white shadow-2xl ring-1 ring-white/10 backdrop-blur-md"
+      class="absolute right-4 top-20 z-20 max-h-[78vh] w-72 overflow-y-auto rounded-2xl bg-surface-1 p-3 text-xs text-text-primary shadow-[0_8px_24px_rgba(0,0,0,0.45)] border border-hairline"
     >
       <!-- 召喚王 -->
-      <div class="mb-3 rounded-lg bg-white/5 p-2">
-        <div class="mb-1 text-sm font-black text-fuchsia-300">召喚王</div>
+      <div class="mb-3 rounded-lg bg-surface-1 p-2">
+        <div class="mb-1 text-sm font-medium text-caution">召喚王</div>
         <div class="flex gap-2">
-          <select v-model.number="summonIndex" class="min-w-0 flex-1 rounded bg-black/50 px-2 py-1 text-white outline-none">
-            <option v-for="(n, i) in bossNames" :key="i" :value="i" class="text-black">{{ i + 1 }}. {{ n }}</option>
+          <select v-model.number="summonIndex" class="min-w-0 flex-1 rounded bg-surface-2 px-2 py-1 text-text-primary outline-none">
+            <option v-for="(n, i) in bossNames" :key="i" :value="i" class="text-void">{{ i + 1 }}. {{ n }}</option>
           </select>
-          <button class="rounded bg-fuchsia-500 px-3 py-1 font-black active:scale-95" @click="onSummonBoss">召喚</button>
+          <button class="rounded bg-caution px-3 py-1 font-medium active:scale-95" @click="onSummonBoss">召喚</button>
         </div>
       </div>
 
       <template v-for="g in debugGroups" :key="g.group">
-        <div class="mb-1 mt-2 text-sm font-black text-fuchsia-300">{{ g.group }}</div>
+        <div class="mb-1 mt-2 text-sm font-medium text-caution">{{ g.group }}</div>
         <div v-for="item in g.items" :key="item.index" class="mb-2">
           <label v-if="item.type === 'bool'" class="flex cursor-pointer items-center justify-between">
             <span>{{ item.label }}</span>
             <input
               type="checkbox"
-              class="h-4 w-4 accent-fuchsia-400"
+              class="h-4 w-4 accent-accent"
               :checked="item.value > 0.5"
               @change="onDebugToggle(item.index, $event)"
             />
@@ -111,11 +112,11 @@
           <template v-else>
             <div class="flex justify-between">
               <span>{{ item.label }}</span>
-              <span class="font-bold text-white/70">{{ fmt(item.value) }}</span>
+              <span class="font-medium text-text-secondary">{{ fmt(item.value) }}</span>
             </div>
             <input
               type="range"
-              class="w-full accent-fuchsia-400"
+              class="w-full accent-accent"
               :min="item.min"
               :max="item.max"
               :step="item.step"
@@ -137,7 +138,7 @@
     <!-- 跳躍鈕（手機，遊玩中顯示） -->
     <button
       v-show="stats.state === 'running'"
-      class="absolute bottom-12 right-10 z-10 flex h-20 w-20 items-center justify-center rounded-full bg-sky-500/70 text-base font-black text-white backdrop-blur-md transition active:scale-90"
+      class="absolute bottom-12 right-10 z-10 flex h-20 w-20 items-center justify-center rounded-full bg-surface-4 text-base font-medium text-text-primary transition active:scale-90"
       @pointerdown.prevent="onJump"
     >
       跳躍
@@ -196,6 +197,7 @@ import {
 import { QUALITIES, type QualityId } from '../game/quality';
 import type { RunState } from '../game/upgrades';
 import type { Difficulty } from '../game/difficulty';
+import GameIcon from './game-icon.vue';
 import Hud from './hud.vue';
 import Joystick from './joystick.vue';
 import LevelUpModal from './level-up-modal.vue';

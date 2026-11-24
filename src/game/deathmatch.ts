@@ -29,17 +29,18 @@ export const DEATHMATCH = {
 export interface Mutator {
   id: 'rage' | 'frail' | 'giant' | 'explode' | 'split' | 'elite' | 'crawl';
   name: string;
-  emoji: string;
+  /** lucide 圖示 key（見 ui/icons.ts） */
+  icon: string;
   desc: string;
 }
 export const MUTATORS: Mutator[] = [
-  { id: 'rage', name: '狂暴', emoji: '⚡', desc: '怪物移動更快' },
-  { id: 'frail', name: '脆皮潮', emoji: '🥚', desc: '怪物血薄但數量更多' },
-  { id: 'giant', name: '巨人化', emoji: '🗿', desc: '怪物變大變壯' },
-  { id: 'explode', name: '爆裂', emoji: '🔥', desc: '怪物死亡會在原地小爆炸' },
-  { id: 'split', name: '分裂潮', emoji: '🧫', desc: '怪物變多，死掉在原地補上' },
-  { id: 'elite', name: '菁英潮', emoji: '💀', desc: '大量菁英怪出沒' },
-  { id: 'crawl', name: '爬行潮', emoji: '🧟', desc: '全部殭屍趴地爬行（慢但難察覺）' },
+  { id: 'rage', name: '狂暴', icon: 'rage', desc: '怪物移動更快' },
+  { id: 'frail', name: '脆皮潮', icon: 'frail', desc: '怪物血薄但數量更多' },
+  { id: 'giant', name: '巨人化', icon: 'giant', desc: '怪物變大變壯' },
+  { id: 'explode', name: '爆裂', icon: 'explodeMutant', desc: '怪物死亡會在原地小爆炸' },
+  { id: 'split', name: '分裂潮', icon: 'split', desc: '怪物變多，死掉在原地補上' },
+  { id: 'elite', name: '菁英潮', icon: 'elite', desc: '大量菁英怪出沒' },
+  { id: 'crawl', name: '爬行潮', icon: 'crawl', desc: '全部殭屍趴地爬行（慢但難察覺）' },
 ];
 
 /** 死鬥分數：波數主導，擊殺與存活當細分 */

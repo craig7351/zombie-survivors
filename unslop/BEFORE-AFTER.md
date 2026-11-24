@@ -1,0 +1,410 @@
+# AI 生成的醜網頁 vs 改後 — 逐項對照
+
+> 教材用途：給學生看的「AI 味介面」實例對照（輔哥指定）。
+> 對象：殭屍大逃殺 v2.0，**全站 19 個 component**（首頁、遊戲內 HUD、以及其餘 17 個畫面／元件）。
+> unslop by Damir Sokolovsky ([@heydamir](https://x.com/heydamir)), [heydamir.design/unslop](https://heydamir.design/unslop), CC BY 4.0。
+
+**授權聲明（重要，務必保留給學生看到）**
+- `unslop` 技能：CC BY 4.0，作者 Damir Sokolovsky ([@heydamir](https://x.com/heydamir))。
+- 校內教材引用、改寫成講義：**沒問題**。
+- 若要散布給學生或上架公開教材集：**只取「教學想法與檢核表」**，程式碼部分請先與作者確認。
+- 產出的改版程式碼（`src/` 變更）為本專案自身作品。
+
+---
+
+## 素材對照
+
+| | 改前 | 改後 |
+|---|---|---|
+| 首頁 | `unslop/original.live.png` | `unslop/after.png` |
+| 遊戲內 HUD | `unslop/gameplay-2.png` | `unslop/after-gameplay.png` |
+| 首頁 DOM | `unslop/original.html` | `unslop/after.html` |
+| HUD DOM | `unslop/before-hud.html` | `unslop/after-hud.html` |
+
+截圖視窗一致：1440×900，同一支 Playwright 腳本（`unslop/shoot-game.mjs` 與 `unslop/shoot-after.mjs`）。
+
+---
+
+## 一、數據：slop 徵兆實測（實際 DOM，排除 Tailwind 框架 utility 定義）
+
+掃描方式：取渲染後 DOM，剝掉 `<style>`／`<script>`，只算真正用到的 class。
+
+### 1.0 計數口徑（先講清楚，免得數字打架）
+
+| 面向 | 做法 |
+|---|---|
+| **★ 兩層口徑（★ 必須分開講，★ ★ 否則數字會打架）★** | ★ **第一層：原始碼掃描**（★ 拿來報「改前 → 改後」★ 對照表）★ —— ★ 用**子字串比對**，★ `backdrop-blur-md`／`backdrop-blur-sm`／`backdrop-blur` 各算一處。<br>★ **第二層：渲染後 DOM 稽核**（★ 拿來報「最終驗收」★ 數字）★ —— ★ 用**精確 token 比對**（★ class token 完全等於 `backdrop-blur` 才算），★ ★ 並額外掃 `getComputedStyle` 的漸層。<br>★ ★ 兩層數字本來就會不同（★ 原始碼 8 處 `rounded-full` vs DOM 6 處），★ ★ **這不是矛盾，是視角不同**；★ ★ ★ 教材引用時一定要講明用的是哪一層。 |
+| **原始碼層：一處怎麼算** | **子字串比對**。`backdrop-blur-md`、`backdrop-blur-sm`、`backdrop-blur` 都各算一處。 |
+| **為什麼不用 token 精確比對** | 若比對「class token 完全等於 `backdrop-blur`」，帶後綴的 `backdrop-blur-md` 會被整批漏掉——而全站幾乎都是帶後綴的寫法。**本專案第一輪就踩過這個坑**：口徑錯誤導致「首頁＋HUD 清零」的表象下，全站其實還剩 32 處。 |
+| **全站口徑** | `src/` 全部 .vue/.ts/.css（53 檔），但**剝除 `style.css` 的 `@theme` 區塊**（那是 token 定義本身，不是使用處）。 |
+| **改前基線怎麼來** | `git archive 3d538d6 src` 取出原始碼實測，不靠印象、不靠手數。<br>★ ★ 順帶一提：★ 用 `7358a0e`（再前一個 commit）做基線，★ ★ slop 數字**完全相同**（48/90/14/46/5/8/1/5/3/1），★ ★ 因為那兩個 commit 之間沒動到介面。★ ★ 教材統一寫 **`3d538d6`**（★ ★ 線上 v2.0 對齊的那一版）。 |
+| **檔案數** | ★ 改前基線 `3d538d6` 的 `src/` = **51 檔**（19 vue + 31 ts + 1 css）；★ ★ 改後工作區 = **53 檔**（★ ★ 新增 `src/ui/icons.ts` 圖示登錄表 ＋ `src/game/extra-weapons.ts`）。★ ★ 掃描時兩個基線要對齊，★ ★ 否則「檔案數不同」會被誤讀成數字不可比。 |
+| **emoji 口徑** | 下列 Unicode 區段的**聯集**（★ 這組區段重現出的正好是 153 處／66 種，★ ★ 可直接照抄驗證）：<br>`U+1F000–U+1FAFF`（含 1F1E6–1F1FF 國旗）、`U+2190–U+21FF`（↑↓←→ 與 🔀🔁 等）、`U+2300–U+23FF`（⌚⌛ 等）、`U+24C2–U+24FF`（Ⓜ 等）、`U+25A0–U+27BF`（▲●■ 等）、`U+2B00–U+2BFF`（⬆⬇ 等）、`U+FE0F`（變體選擇符）<br>★ **這個口徑包含 `←` `→` `▸` `✕` `⚠` 等符號**——★ ★ 它們不是 emoji，★ ★ 但在 AI 生成的介面裡確實被當圖示亂用，★ ★ 所以教材把它們一起算進「要清掉的符號垃圾」是合理的。<br>★ 若只想嚴格算 emoji（不含箭頭與幾何符號），★ ★ 改用 `U+1F300–U+1FAFF` 單一區段 = **85 處／46 種**，★ ★ 數字同樣成立。<br>★ 純 ASCII 箭頭 `→`（U+2192）落在 `U+2190–U+21FF`，★ ★ 故改後殘留的 19 處 `→` 全在程式註解裡，★ ★ **實質 emoji = 0**。 |
+
+> ★ 這段「計數口徑」本身就是教材價值最高的段落：**掃描工具寫錯，數字就會說謊，而且看起來很像真的。**
+
+### 1.0.5 ★ 最終稽核：渲染後 DOM 全站逐畫面實測（★ class token ＋ computed style 雙層）
+
+★ 小關要求「每個 component 改完用渲染後 DOM 驗，不看原始碼 grep」——★ 這是本專案最嚴格也最該做的一步。
+★ 稽核腳本：`unslop/audit-dom.mjs`（Playwright 走訪 10 個畫面）。
+★ ★ **掃描分兩層，缺一不可：**
+★ 1. **class token 層** —— ★ 逐元素讀 `class` 屬性，★ **精確 token 比對**（token 完全相等才算命中）。
+★ 2. **computed style 層** —— ★ 逐元素讀 `getComputedStyle(el).backgroundImage` ／ `background`，★ ★ 抓 **inline `:style` 與 `<style>` 區塊裡的漸層**。
+★ ★ **★ 為什麼第 2 層不能省：★ ★ 第一版稽核只讀 `class` 屬性，★ ★ 於是 `:style="{ background: 'linear-gradient(...)' }"` 這種寫法**完全不在掃描範圍內** —— ★ 難度選擇頁那張卡片的漸層**真的會渲染**，★ ★ 但腳本看不見。★ ★ ★ 這是**工具盲區，不是事實**：★ ★ 「渲染後 DOM = 0」★ ★ 會變成一句**自己騙自己的話**。
+
+| 畫面 | 元素數 | emoji | slop 徵兆 |
+|---|---:|---:|---|
+| landing（首頁） | 58 | 0 | **全部 0** |
+| leaderboard（排行榜） | 55 | 0 | **全部 0** |
+| bestiary（怪物圖鑑） | 132 | 0 | **全部 0** |
+| messages（留言板） | 41 | 0 | **全部 0** |
+| onlineHistory（線上人數） | 47 | 0 | **全部 0** |
+| mode（模式頁） | 46 | 0 | **全部 0** |
+| difficulty（難度頁） | 82 | 0 | **全部 0** |
+| menu（遊戲內選單） | 132 | 0 | **全部 0** |
+| game-hud（遊戲內 HUD） | 47 | 0 | `rounded-full` = 6 |
+| pause-menu（暫停選單） | 54 | 0 | **全部 0** |
+| **全站合計** | **694** | **0** | **全部 0**（`rounded-full` 6） |
+
+★ 全站 `backdrop-blur` / `backdrop-filter` / `font-black` / `font-extrabold` / `font-bold` /
+★ `tracking-widest` / `tracking-wider` / `animate-ping` / `text-shadow` / `drop-shadow` /
+★ `bg-black/*` / `ring-1` / `ring-2` / `shadow-2xl` / `gradient-to` / emoji —— ★ ★ **渲染後 DOM 實測全部為 0**。
+
+★ **漸層（computed style 層）★ 稽核輸出：**
+```
+=== 漸層（computed style）===
+  DOM 實例 13 處 → 去重後定義 3 處
+  [1] <span class="warn-stripe absolute top-0 left-0">  repeating-linear-gradient(45deg, ...)
+      出現場面: landing
+  [2] <div class="absolute inset-0 overflow-hidden">  linear-gradient(160deg, ...)
+      出現場面: leaderboard, bestiary, messages, onlineHistory, mode, difficulty
+  [3] <div class="absolute inset-0">  radial-gradient(rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)
+      出現場面: leaderboard, bestiary, messages, onlineHistory, mode, difficulty
+```
+★ ★ **這裡又有第二個坑：DOM 實例 13 ≠ 定義 3。** ★ ★ `background-polygons` 會在**每一個畫面**重建，★ ★ 所以同一份漸層在 DOM 裡出現十幾次；★ ★ 但原始碼只有 **3 處定義**。
+★ ★ 教材要給學生能照著 grep 對上的數字，★ ★ 所以稽核腳本把**實例去重回定義**（去重鍵 = tag + class + computed 值）。
+
+#### 漸層合法例外（★ 全站僅此 3 處，★ 全部是 Signature）
+
+| # | 位置 | 寫法 | 為何合法 |
+|---|---|---|---|
+| 1 | `src/style.css:86` | `.warn-stripe { background-image: repeating-linear-gradient(45deg, …) }` | ★ **Signature 本體** —— ★ 4px 黑黃警戒條紋，全站唯一的個性記號 |
+| 2 | `src/components/background-polygons.vue:29` | `linear-gradient(160deg, #0a0f0a 0%, #142016 45%, #0c1118 100%)` | ★ **Signature 背景藝術** —— ★ 廢墟天空的縱深，★ 屬情境美術而非 UI 裝飾 |
+| 3 | `src/components/background-polygons.vue:10` | `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)` | ★ 同上 —— ★ 四周壓暗的暈影，★ 屬背景美術 |
+
+★ ★ **改前基線 `3d538d6` 的 inline 漸層共 8 處**（background-polygons 2、landing-screen 3、difficulty-screen 1、mode-screen 2）。
+★ ★ 其中 **3 處是真正該清的 slop**，★ ★ 已在第二輪改造中改掉：
+
+| 位置 | 改前 | 改後 | 為什麼這樣改 |
+|---|---|---|---|
+| `difficulty-screen.vue:21` | `linear-gradient(90deg, ${d.color}22, rgba(255,255,255,0.05))` | ★ `background: ${d.color}1a` ＋ `borderLeft: 3px solid ${d.color}` | ★ 漸層改成**平面半透明 ＋ 3px 左側色條** —— ★ ★ 色碼仍取自難度設定，★ ★ 但不再用漸層假裝立體 |
+| `mode-screen.vue:66` | `linear-gradient(180deg, rgba(220,60,60,.28), rgba(120,20,20,.28))` | ★ `color-mix(in srgb, var(--color-danger) 18%, transparent)` | ★ 改成**以 token 色平面混合** —— ★ ★ 不再硬寫 rgba，★ ★ 色彩回到 token 表 |
+| `mode-screen.vue:70` | `linear-gradient(180deg, rgba(240,80,80,.4), rgba(140,30,30,.4))` | ★ `color-mix(in srgb, var(--color-danger) 28%, transparent)` | ★ 同上，★ hover 態只改混合比例 |
+
+★ ★ **「漸層一律不能用」不是本教材的規則。** ★ ★ 規則是：**UI 容器與卡片不得用漸層製造假深度**；★ ★ **背景美術與 Signature 可以用**。★ ★ ★ 教材最怕的是把「我清掉的」寫成「不該有的」——★ ★ ★ 那會讓學生去拆掉該留的東西。
+
+★ ★ ★ **這一次稽核抓到三個「原始碼掃描看不到」的問題**，★ ★ 值得單獨列出：
+
+**問題一：`rounded-full` 數到 12，但實際只有 6。**
+★ HUD 在 `game-view` 裡是**常駐掛載**的，★ ★ 切到暫停選單時 HUD 仍在 DOM 裡，★ ★ 不去重就會把同一批元素數兩次。
+★ ★ 修正：稽核腳本給每個元素掛 `data-audit-id`，★ ★ 用 `Set` 做全域去重，★ ★ 只統計「本畫面新增」的元素。
+
+**問題二：原始碼 8 處，渲染後 6 處，★ ★ 差在王血條。**
+★ 王血條是 `v-if="stats.bossActive"`，★ ★ 平時不渲染，★ ★ 所以正常遊玩時 DOM 只有 6 處。
+
+**★ ★ ★ 問題三：★ 「渲染後 DOM = 0 漸層」原本是★ 一句★ ★ ★ 自己騙自己的話。**
+★ 第一版稽核只讀 `class` 屬性，★ ★ inline `:style` 的 `linear-gradient` 完全不在掃描範圍內。
+★ ★ 實際上 `difficulty-screen` 與 `mode-screen` 有 **3 處漸層真的會渲染**，★ ★ 但腳本回報「0」。
+★ ★ 這不是造假，★ ★ **是掃描範圍比宣稱的窄** —— ★ ★ 而「範圍沒講清楚」★ ★ 等於「數字在說謊」。
+★ ★ 修法：第 2 層改用 `getComputedStyle(el).backgroundImage` ／ `.background`，★ ★ ★ 然後**重跑**。
+★ ★ ★ ★ 教材的教學重點因此變得更強：
+> ★ 「★ 連你自己寫的驗證工具都會算錯。★ AI 給你的數字看起來很像真的，你要問它怎麼算出來的。」
+> ★ ★ ★ ★ 而這一句的證據，★ ★ ★ ★ 就在這份教材自己的稽核腳本裡 —— ★ ★ ★ ★ 工具盲區是活的案例，★ ★ ★ ★ 不是修辭。
+★ ★ **兩個數字都對**，★ ★ 差別是「王是否在場」——★ ★ 這就是為什麼教材的數字必須標明口徑。
+
+> ★ ★ ★ **教材題眼（★ 這次稽核後更有力了）**：★ ★ 「你以為你改完了的時候，通常還有三分之一沒改到。」
+> ★ ★ 而且——★ ★ **連你自己寫的驗證工具都會算錯**。★ ★ 這次是重複計數，★ ★ 上次是漏掉帶後綴的 class。
+> ★ ★ ★ **AI 給你的數字看起來很像真的，★ ★ 你要問它怎麼算出來的。**
+
+### 1.1 全站（`src/` 全部 53 個檔案，剝除 `style.css` 的 token 定義）
+
+| 徵兆 | 改前 | 改後 |
+|---|---|---|
+| `backdrop-blur` 玻璃模糊 | 48 | **0** |
+| `backdrop-filter`（style 寫法） | 2 | **0** |
+| `font-black`（字重 900） | 90 | **0** |
+| `font-bold`（字重 700） | 14 | **0** |
+| `rounded-full` | 46 | **8**（見下方註） |
+| `tracking-widest` / `tracking-wider` | 5 / 8 | **0 / 0** |
+| `animate-ping` 呼吸光點 | 1 | **0** |
+| `gradient-to` 漸層（class） | 5 | **0** |
+| ★ **inline 漸層（★ computed style 層）★** | **8**（★ background-polygons 2、landing-screen 3、difficulty-screen 1、mode-screen 2）★ | **3**（★ 全為 Signature，★ ★ 見下方例外清單）★ |
+| `text-shadow` 假陰影 | 3 | **0** |
+| `drop-shadow-` 彩色陰影 | 1 | **0** |
+| **emoji** | **153 處／66 種** | **0 處／0 種** |
+
+> ★ 改後仍留 **`rounded-full`**：**原始碼 8 處 / 渲染後 DOM 6 處**，★ 全部是**圓形圖形元件**，不是矩形容器：
+> HUD 血條槽＋填充（2）、HUD 經驗條槽＋填充（2）、手機搖桿底盤（1）、手機跳躍鈕（1）＝ 6 處（DOM）；
+> 另王血條槽＋外框（2）＝原始碼 8 處，因 `v-if="stats.bossActive"` 平時不渲染。
+> 依 `TOKENS.md` §4，這是明列的合法例外；**改前的 46 處中有 46 處是容器**（按鈕、輸入框、卡片、徽章），已全數清零。
+> ★ 口徑細節見 §1.0.5。
+
+### 1.2 首頁（渲染後 DOM）
+
+| 徵兆 | 改前 | 改後 |
+|---|---|---|
+| `backdrop-blur` | 7 | **0** |
+| `font-black` | 8 | **0** |
+| `font-bold` | 3 | **0** |
+| `rounded-full` | 5 | **0** |
+| `animate-ping` | 1 | **0** |
+| `tracking-widest` | 2 | **0** |
+| `gradient` | 2 | **0** |
+| `text-shadow` | 1 | **0** |
+| `bg-black/40` 半透明疊底 | 7 | **0** |
+| `ring-1` | 3 | **0** |
+| 螢光綠 `text-lime-*` | 12 | **0** |
+| 螢光綠 `bg-lime-*` | 4 | **0** |
+| **emoji** | **14** | **0** |
+
+### 1.3 遊戲內 HUD（渲染後 DOM）
+
+| 徵兆 | 改前 | 改後 |
+|---|---|---|
+| `backdrop-blur` | 8 | **0** |
+| `font-black` | 3 | **0** |
+| `font-bold` | 1 | **0** |
+| `rounded-full` | 4 | 4（血條／經驗條，合法例外） |
+| `gradient` | 2 | **0** |
+| `text-shadow` | 1 | **0** |
+| `bg-black/40` 半透明疊底 | 8 | **0** |
+| **emoji** | **0** | **0** |
+
+---
+
+## 二、改前／改後的視覺描述（看圖說話）
+
+### 2.1 首頁版面 —— 一柱擎天 vs 左右分欄
+
+**改前**：整個畫面是**垂直置中的一柱**。毒綠大標「殭屍大逃殺」帶 6px 黑描邊與 4px 立體陰影，下面依序是副標、藥丸狀在線人數徽章、藥丸狀暱稱框、1 顆主按鈕、4 顆 emoji 副按鈕、4 張藥丸統計卡。左右兩邊是空的大片深藍漸層，只有 22 個多邊形在那裡漂。1440 像素寬的螢幕，內容只佔中間約 320px。
+
+**改後**：**左文字右實機畫面**的兩欄（`lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]`）。左欄自上而下是標題（36px／桌機 56px，semibold）、副標、靜態在線人數、暱稱欄＋橘色主 CTA、四個統計數字（下方一條髮絲線分隔）、最後是一列**純文字**次要入口（排行榜／怪物圖鑑／留言板／線上人數），不再是一排藥丸按鈕。右欄是**真實的遊戲實機截圖**，圖框左緣有一條 4px 黑黃警戒條紋。
+
+**一眼可辨的差異**：改前的畫面是「模板」——把「殭屍大逃殺」四個字換成任何遊戲名都不會破綻；改後右欄那張實機畫面與左緣警戒條紋，換成別的遊戲就完全不成立。
+
+### 2.2 玻璃卡片 —— 糊鏡面 vs 表面階梯
+
+**改前**：每張卡片都是「半透明黑底 + 背景模糊 + 白色細框」三件套。深色底上疊半透明黑，再加上一層模糊，結果是**什麼都沒有的糊鏡面**——卡片與背景的界線靠模糊產生的微弱色差撐著，疊在一起看是一片灰。
+
+**改後**：玻璃全部拆掉。卡片改用**表面階梯**（`bg-surface-1` → `surface-2` → `surface-3`）分層，界線靠 **8% 透明度的一條髮絲線**（`border-hairline`）畫出來。浮層才留陰影，而且是全站唯一一個允許的陰影：`0 8px 24px rgba(0,0,0,.45)`。
+
+**一眼可辨的差異**：改後的卡片邊界是**一條實線**，不是一團模糊。
+
+### 2.3 色彩 —— 五色並陳 vs 一個警戒橙
+
+**改前**：毒綠 `#c6ff7a`（主色）、萊姆 `#c6ff7a`、琥珀 `#ffd23f`、玫瑰 `#ff5a5a`、螢光青——五套色系同時當主色，而且**每個畫面有自己的漸層方向**（首頁藍、選單綠、死鬥卡紅）。彩色 ring（`ring-lime-400/20`、`ring-rose-400/50`、`ring-fuchsia-500/80`）散落各處。
+
+**改後**：底色是一組**廢墟灰階梯**（暖偏綠的土色，不是純灰）：`void → surface-1..4`。**accent 全站只有一個**：警戒橙 `#ff7a1a`。語意色降為三支低調的 danger／success／caution，只出現在狀態上（血條、經驗條、死亡訊息）。所有 `bg-amber-400`／`bg-lime-400`／`bg-lime-500` 這些「次數最多的主色」全部併進 `bg-accent`。
+
+**一眼可辨的差異**：改後畫面裡**找不到第二種「想吸引你注意」的顏色**。
+
+### 2.4 字體 —— 全部 900 字重 vs 階層靠大小
+
+**改前**：`font-black`（900）滿版飛——標題、卡名、按鈕文字、數字、標籤全是 900，等於**沒有層級**。`tracking-widest` 撒在中文標題上。自訂字級 `text-[0.72rem]`／`[0.66rem]`／`[0.26em]` 混著用。
+
+**改後**：字級固定 8 階（11/12/13/14/16/20/28/56），字重只用 **400／500／600**。階層完全靠**大小＋顏色**做出來。
+
+**一眼可辨的差異**：改後的標題不再「粗到溢出」，因為它根本不需要粗到那個程度。
+
+### 2.5 圖示 —— 153 個 emoji vs 一套線性圖示
+
+**改前**：emoji 當圖示（`▶ 🏆 🧟 💬 📈 💰 🆕 😀 😱 🔫 ⚡ 🧲 🐕 💥 🦈`），emoji 塞進數字裡（`💰 1234`、`解鎖 💰300`），emoji 當 3D 載入佔位，還混著 `← ▸ ✕ ↩ ⬆ ⚖ ⚠` 四套不同記號系統。
+
+**改後**：單一登錄表 `src/ui/icons.ts` → 全站走 `game-icon.vue`（18px、stroke 1.5、間距 8px）。資料層（`characters.ts`／`difficulty.ts`／`upgrades.ts`／`meta.ts`／`deathmatch.ts`／`changelog.ts`）也一併改成 `icon` key。
+
+**一眼可辨的差異**：改後每個圖示線寬一致、風格一致；改前同一個「返回」動作在 6 個檔案裡長了 6 種樣子。
+
+### 2.6 圓角 —— 什麼都是藥丸 vs 按尺寸分級
+
+**改前**：返回鈕、輸入框、模式切換鈕、難度分頁、金幣徽章、發送鈕、開始鈕、連整個難度選擇項，全是 `rounded-full`。藥丸沒有資訊量，只是「AI 預設」。
+
+**改後**：按尺寸分級 —— 標籤 4px、按鈕／輸入框 8px、卡片 12px、面板 16px，**巢狀半徑 = 外半徑 − padding**。合法例外只剩進度條與搖桿盤這類圓形圖形。
+
+**一眼可辨的差異**：改後的按鈕是「有稜角的面板」，不再是一排軟軟的藥丸。
+
+### 2.7 動態 —— 彈簧與漂浮 vs 單一曲線
+
+**改前**：`cubic-bezier(0,1.65,1,1.65)` 彈簧讓按鈕「彈」一下；`animate-ping` 讓在線狀態點不停呼吸；22 個多邊形以 14–34 秒無限循環漂移，每次載入還隨機重排——純裝飾 filler。
+
+**改後**：單一曲線 `cubic-bezier(0.22,1,0.36,1)`、120–180ms。在線狀態改成**靜態小圓點＋文字**（數字本來就是即時的，光暈只是裝飾）。按下 `scale(0.97)`，hover 改表面階梯不縮放。
+
+**一眼可辨的差異**：改後畫面**不會有東西一直在動**——沒有動靜雜訊。
+
+### 2.8 標題 —— 假描邊假陰影 vs 真階層
+
+**改前**：`-webkit-text-stroke: 6px #14210f` ＋ `text-shadow: 0 6px 0 rgba(0,0,0,.35)`。這是插畫感裝飾，不是字體階層。
+
+**改後**：56px（行動 36px）、`font-semibold`、`tracking-[-0.02em]`、純 `text-primary`。版本號降為 11px 的次要標記。
+
+### 2.9 深度 —— 彩色陰影 vs 表面階梯
+
+**改前**：`shadow-2xl`、`drop-shadow-[0_2px_0_rgba(0,0,0,0.5)]`、彩色 glow 混用。
+
+**改後**：深色主題的深度改由**表面階梯 + 髮絲線**給出，唯一陰影只給浮層。
+
+### 2.10 Signature —— 沒有個性記號 vs 一條警戒條紋
+
+**改前**：全站沒有任何一個「只有這個產品才可能有」的東西。
+
+**改後**：**一條 4px 黑黃警戒條紋**（工地圍條感），全站只用三處：首頁 hero 圖框左緣、王血條上緣、升級面板標題左側。
+
+---
+
+## 三、逐項對照清單（左「原本怎樣爛」→ 右「改成怎樣」）
+
+| # | 原本 | 改成 | 對應徵兆 |
+|---|---|---|---|
+| 1 | Hero 全部置中堆疊 | 左文字右實機畫面兩欄 | Hero 一律置中堆疊 |
+| 2 | Hero 沒有任何真實視覺，只有多邊形漂移 | 右欄放真實實機截圖，廢墟色調只疊不重繪 | 模板測試 |
+| 3 | 五套色系並存當主色，各畫面各有一個漸層方向 | 廢墟灰階梯 + 唯一 accent 警戒橙 + 三支語意色 | 多色並存 / 無單一 accent |
+| 4 | 全站 48 處玻璃模糊卡片 | 表面階梯 + 8% 髮絲線 | 玻璃卡片佔滿全站 |
+| 5 | `font-black` 90 處，標題／按鈕／數字／標籤全 900 | 8 階字級 + 400/500/600，階層靠大小與顏色 | 字重 900 當階層 / 寬字距 / 自訂非階梯字級 |
+| 6 | 數字格式混雜（`10859`／`523h58m`／`12538976`） | 全站 `.num` 等寬數字 | 數字格式不一 |
+| 7 | emoji 153 處／66 種當圖示，混 4 套記號系統 | 單一 lucide 登錄表，資料層一併清乾淨 | emoji 當圖示與資料層 |
+| 8 | 46 處容器全是 `rounded-full` 藥丸 | 按尺寸分級 4/8/12/16，例外只有圓形圖形 | 所有東西都是藥丸 |
+| 9 | 彈簧 hover、`animate-ping`、多邊形無限循環、動畫 width | 單一曲線 120–180ms，只動 transform/opacity/color | animate-ping / 彈簧 / 無限循環裝飾 |
+| 10 | 標題 6px 假描邊 + 4px 立體假陰影 | 56px semibold + 真階層 | 標題假描邊 + 假陰影 |
+| 11 | 文案夾帶 emoji 與語氣詞（`知道了，開玩！`） | 圖示走元件元件，介面文案去掉驚嘆號與波浪號 | 介面文字夾裝飾符號 |
+| 12 | 19 個 component 各自一套 class | 先定 token 表，再逐頁套用 | 模板回退徵兆 |
+| 13 | 沒有任何個性記號 | 4px 警戒條紋 | 模板測試（最後一頁） |
+
+---
+
+## 四、這次改造用到的工具與判準
+
+### 4.1 工具
+
+| 工具 | 用途 |
+|---|---|
+| `unslop` 技能（CC BY 4.0） | 整套判準與檢核表來源 |
+| Tailwind v4 `@theme`（`src/style.css`） | token 實作層——變數即 token，class 自動生成 |
+| `lucide-vue-next` | 單一套線性圖示 |
+| `src/ui/icons.ts` | 圖示登錄表（語意 key → 圖示元件） |
+| Playwright（`unslop/shoot-game.mjs`／`shoot-after.mjs`／`snap-hud.mjs`） | 自動玩進遊戲、截圖、擷取 HUD DOM 做掃描 |
+| `git archive <commit> src` | 取原始版 src 做**改前基數**實測（不靠印象、不靠 grep 數） |
+
+### 4.2 判準（摘錄自 `unslop/TOKENS.md`）
+
+**色彩**
+- 中性階梯 5 階（`void`／`surface-1..4`），暖偏綠的土色，非純灰
+- 文字角色**三階**：`text-primary`／`text-secondary`／`text-muted`
+- **accent 全站只此一個**：警戒橙 `#ff7a1a`
+- 語意色三支，只用於狀態：`danger`／`success`／`caution`
+- ❌ 玻璃模糊、漸層文字／底／按鈕、彩色 glow、多個 accent 同時當主色
+
+**字體與字級**
+- 字級固定 **8 階**：11／12／13／14／16／20／28／56
+- 字重**只用 400／500／600**，禁止 700+
+- 階層靠**大小＋顏色**，不靠字重
+- 數字全站 `font-variant-numeric: tabular-nums`（`.num`）
+
+**間距**
+- 4px 基底，只用 8 級：4／8／12／16／24／32／48
+- ❌ 非階梯值（1.5／2.5／5／7／10）
+
+**圓角**
+- 按尺寸分級：標籤 4／按鈕・輸入框 8／卡片 12／面板 16
+- 巢狀半徑 = 外半徑 − padding
+- ❌ `rounded-full` 用於容器；合法例外只有進度條與在線狀態點
+
+**圖示**
+- lucide 單一套，18px（清單）／20px（按鈕）／14px（密集列），stroke 1.5，間距 8px
+- **全站 emoji = 0**（含資料層）
+
+**Signature**
+- 4px 黑黃警戒條紋，**全站只用 3 處**
+
+**動態**
+- 唯一曲線 `cubic-bezier(0.22,1,0.36,1)`，120–180ms
+- 只動 `transform`／`opacity`／`color`／`background`／`border`
+- ❌ `animate-ping`、彈簧 overshoot、動畫 width/height、無限循環裝飾動畫
+
+**深度**
+- 深色主題用**表面階梯 + 髮絲線**，不用陰影
+- 唯一允許的陰影：`0 8px 24px rgba(0,0,0,.45)`，只給浮層
+
+### 4.3 順序：先立系統，再套頁面
+
+這次改動最重要的收穫不是「首頁變好看了」，而是**順序**：
+
+1. **先寫 `TOKENS.md`**，把色彩／字級／間距／圓角四類**一次定死**。
+2. **再實作 token**（`src/style.css` 的 `@theme` ＋ `src/ui/icons.ts` 的圖示登錄表）。
+3. **才改頁面**——先改「首頁 ＋ HUD」兩個示範板驗證 token 表好不好用。
+4. **驗證完才推全站**。
+
+順序錯了會怎樣：會在規則還沒定型時，用不同的寫法重做同一批東西——本專案第一輪就實測到，`backdrop-blur` 在「首頁＋HUD 已清零」的表象下，全站其實還剩 32 處（首輪掃描腳本的正則漏掉了帶後綴的 `backdrop-blur-md`）。**沒有全站掃描，就會以為自己改完了。** 這是本次最實用的一課。
+
+所以本次實際是**兩輪**：
+
+| 輪次 | 範圍 | 產出 |
+|---|---|---|
+| 第一輪 | 首頁 ＋ HUD 兩個示範板 | 驗證 token 表；同時發現掃描口徑有問題 |
+| 第二輪 | 其餘 17 個 component | 全站套用同一套 token |
+
+兩輪的數字都如實記在上面（§1.1 是**最終全站**口徑，不是第一輪）。
+
+### 4.4 驗證腳本
+
+| 腳本 | 用途 |
+|---|---|
+| `unslop/shoot-game.mjs` | 從**線上版**自動玩進遊戲內截圖（hero 素材來源，過期時重跑即可） |
+| `unslop/shoot-after.mjs` | 對**本機版**截首頁與遊戲內畫面（需先 `pnpm build` 並起 preview） |
+| `unslop/snap-hud.mjs` | 擷取遊戲內 HUD 的 DOM（slop 掃描用） |
+| `unslop/audit-dom.mjs` | ★ **全站稽核**：走訪 10 個畫面，★ ★ **雙層掃描**（class token 精確比對 ＋ `getComputedStyle` 漸層掃描），★ ★ 全域去重、漸層再去重回「定義數」，★ ★ 產出最終數字 |
+
+重跑全站稽核（★ 這才是最終數字的來源，★ ★ 不是 grep）：
+
+```bash
+cd ~/.openclaw/workspace/chiaqian/zombie-survivors
+pnpm build
+npx vite preview --port 4173 &
+node unslop/audit-dom.mjs        # → unslop/audit-dom.json
+```
+
+★ **★ 預期輸出（★ ★ 這是本教材的最終驗收基準，★ ★ 每次改完都該重跑並比對）：★**
+
+```
+=== 渲染後 DOM 全站稽核（逐畫面實測）===
+  ... 10 個畫面 ...
+  全站合計：slop 徵兆全 0、rounded-full 6、emoji 0 處／0 種
+=== 漸層（computed style）===
+  DOM 實例 13 處 → 去重後定義 3 處
+  [1] warn-stripe  repeating-linear-gradient   （Signature）
+  [2] background-polygons linear-gradient       （Signature）
+  [3] background-polygons radial-gradient       （Signature）
+```
+
+重跑 hero 素材（遊戲更新後）：
+
+```bash
+cd ~/.openclaw/workspace/chiaqian/zombie-survivors
+node unslop/shoot-game.mjs
+cp unslop/gameplay-1.png public/hero-gameplay.png
+```
+
+---
+
+## 五、給學生的三句話
+
+1. **AI 味不是「醜」，是「沒做決定」。** 玻璃卡片、藥丸按鈕、emoji 標籤、字重 900、寬字距 —— 這些都是模型不假思索的預設值。它們沒有錯，只是沒有被決定過。
+
+2. **先把系統定死，再改畫面。** 而且要**掃全站**——你以為改完了的時候，通常還有三分之一沒改到。
+
+3. **乾淨不等於完成。** 把 slop 全部清掉，得到的會是「灰底＋Inter＋一顆按鈕」——那還是模板。最後一頁必須是**只有這個產品才可能有**的畫面：這
+
+4. ★ ★ **連你自己寫的驗證工具都會算錯。** ★ ★ AI 給你的數字看起來很像真的，你要問它**怎麼算出來的**。
+   ★ ★ 這份教材自己的稽核腳本就翻了兩次車：★ ★ 第一次只讀 `class` 屬性，看不見 inline `:style` 的漸層，★ ★ **回報「0」但畫面明明有漸層**；★ ★ 第二次去重沒做，★ ★ 同一批 HUD 元素被數了兩次，★ ★ **`rounded-full` 報 12 實際只有 6**。★ ★ ★ 修完再重跑，★ ★ ★ 數字才會變成你敢寫進講義的數字。裡是那條 4px 警戒條紋，和右欄那張真的實機畫面。
+
+---
+
+_本文件為 unslop 流程產出，與 `AUDIT.md`、`DIRECTION.md`、`TOKENS.md` 一併保留。unslop by Damir Sokolovsky ([@heydamir](https://x.com/heydamir)), CC BY 4.0._

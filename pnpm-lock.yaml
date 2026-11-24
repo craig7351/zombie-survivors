@@ -14,6 +14,9 @@ importers:
       '@babylonjs/loaders':
         specifier: ^9.12.0
         version: 9.12.0(@babylonjs/core@9.12.0)(babylonjs-gltf2interface@9.12.0)
+      lucide-vue-next:
+        specifier: ^1.0.0
+        version: 1.0.0(vue@3.5.38(typescript@5.9.3))
       vue:
         specifier: ^3.5.13
         version: 3.5.38(typescript@5.9.3)
@@ -1234,6 +1237,12 @@ packages:
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
+
+  lucide-vue-next@1.0.0:
+    resolution: {integrity: sha512-V6SPvx1IHTj/UY+FrIYWV5faISsPSb8BnWSFDxAtezWKvWc9ZZ40PDrdu1/Qb5vg4lHWr1hs1BAMGVGm6V1Xdg==}
+    deprecated: Package deprecated. Please use @lucide/vue instead.
+    peerDependencies:
+      vue: '>=3.0.1'
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -2597,6 +2606,10 @@ snapshots:
       triple-beam: 1.4.1
 
   lru-cache@10.4.3: {}
+
+  lucide-vue-next@1.0.0(vue@3.5.38(typescript@5.9.3)):
+    dependencies:
+      vue: 3.5.38(typescript@5.9.3)
 
   magic-string@0.30.21:
     dependencies:

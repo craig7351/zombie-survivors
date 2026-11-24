@@ -20,3 +20,6 @@ download
 
 # 日誌
 *.log
+
+# 本機驗證產物（截圖/稽核 JSON）
+unslop/local-verify/

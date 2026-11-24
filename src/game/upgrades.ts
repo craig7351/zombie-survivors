@@ -95,34 +95,35 @@ export interface Upgrade {
   id: string;
   name: string;
   desc: string;
-  emoji: string;
+  /** lucide 圖示 key（見 ui/icons.ts） */
+  icon: string;
   maxLevel: number;
   apply: (s: RunState) => void;
 }
 
 export const UPGRADES: Upgrade[] = [
-  { id: 'damage', name: '攻擊力', desc: '武器傷害 +1', emoji: '⚔️', maxLevel: 8, apply: (s) => (s.damage += 1) },
-  { id: 'firerate', name: '攻速', desc: '發射間隔 −12%', emoji: '⚡', maxLevel: 8, apply: (s) => (s.fireInterval *= 0.88) },
-  { id: 'multishot', name: '多重彈', desc: '投射物 +1', emoji: '🎯', maxLevel: 4, apply: (s) => (s.projectileCount += 1) },
-  { id: 'range', name: '射程', desc: '鎖定範圍 +20%', emoji: '🔭', maxLevel: 5, apply: (s) => (s.range *= 1.2) },
-  { id: 'projspeed', name: '彈速', desc: '投射物速度 +20%', emoji: '💨', maxLevel: 5, apply: (s) => (s.projectileSpeed *= 1.2) },
-  { id: 'movespeed', name: '移動速度', desc: '移速 +10%', emoji: '👟', maxLevel: 5, apply: (s) => (s.moveSpeed *= 1.1) },
+  { id: 'damage', name: '攻擊力', desc: '武器傷害 +1', icon: 'damage', maxLevel: 8, apply: (s) => (s.damage += 1) },
+  { id: 'firerate', name: '攻速', desc: '發射間隔 −12%', icon: 'fireRate', maxLevel: 8, apply: (s) => (s.fireInterval *= 0.88) },
+  { id: 'multishot', name: '多重彈', desc: '投射物 +1', icon: 'multishot', maxLevel: 4, apply: (s) => (s.projectileCount += 1) },
+  { id: 'range', name: '射程', desc: '鎖定範圍 +20%', icon: 'range', maxLevel: 5, apply: (s) => (s.range *= 1.2) },
+  { id: 'projspeed', name: '彈速', desc: '投射物速度 +20%', icon: 'projectileSpeed', maxLevel: 5, apply: (s) => (s.projectileSpeed *= 1.2) },
+  { id: 'movespeed', name: '移動速度', desc: '移速 +10%', icon: 'moveSpeed', maxLevel: 5, apply: (s) => (s.moveSpeed *= 1.1) },
   {
     id: 'jump',
     name: '跳躍強化',
     desc: '跳得更高、滯空更久（騰空可閃避接觸傷害）',
-    emoji: '🦘',
+    icon: 'jump',
     maxLevel: 4,
     apply: (s) => (s.jumpStrength += 2),
   },
-  { id: 'maxhp', name: '最大生命', desc: '生命上限 +20 並補滿', emoji: '❤️', maxLevel: 5, apply: (s) => (s.maxHp += 20) },
-  { id: 'magnet', name: '拾取範圍', desc: '經驗吸取範圍 +30%', emoji: '🧲', maxLevel: 5, apply: (s) => (s.pickupRadius *= 1.3) },
-  { id: 'xpgain', name: '經驗加成', desc: '經驗獲得 +15%', emoji: '⭐', maxLevel: 5, apply: (s) => (s.xpMultiplier *= 1.15) },
+  { id: 'maxhp', name: '最大生命', desc: '生命上限 +20 並補滿', icon: 'maxHp', maxLevel: 5, apply: (s) => (s.maxHp += 20) },
+  { id: 'magnet', name: '拾取範圍', desc: '經驗吸取範圍 +30%', icon: 'pickup', maxLevel: 5, apply: (s) => (s.pickupRadius *= 1.3) },
+  { id: 'xpgain', name: '經驗加成', desc: '經驗獲得 +15%', icon: 'xpGain', maxLevel: 5, apply: (s) => (s.xpMultiplier *= 1.15) },
   {
     id: 'orbital',
     name: '環繞飛斧',
     desc: '召喚環繞身邊的旋轉斧頭，碰撞傷害敵人；已有則 +1 把並擴大環繞範圍',
-    emoji: '🪓',
+    icon: 'orbital',
     maxLevel: 10,
     apply: (s) => {
       s.orbitalCount += 1;
@@ -134,7 +135,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'aura',
     name: '傷害光環',
     desc: '展開持續傷害光環，自動灼燒靠近的敵人；已有則擴大並增傷',
-    emoji: '🌀',
+    icon: 'aura',
     maxLevel: 10,
     apply: (s) => {
       s.auraRadius = s.auraRadius === 0 ? 4 : s.auraRadius + 1.6;
@@ -145,7 +146,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'lightning',
     name: '連鎖閃電',
     desc: '定期電擊最近的敵人並向周圍連鎖；已有則 +1 連鎖數並增傷',
-    emoji: '⚡',
+    icon: 'lightning',
     maxLevel: 10,
     apply: (s) => {
       s.lightningCount += 1;
@@ -156,7 +157,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'nova',
     name: '新星爆',
     desc: '定期釋放向外擴張的衝擊波，炸傷周圍所有敵人；已有則擴大並增傷',
-    emoji: '💥',
+    icon: 'nova',
     maxLevel: 10,
     apply: (s) => {
       s.novaRadius = s.novaRadius === 0 ? 6 : s.novaRadius + 1;
@@ -167,7 +168,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'boomerang',
     name: '回力鏢',
     desc: '定期丟出長矛飛出再飛回，沿途貫穿傷害敵人；已有則 +1 支並增傷',
-    emoji: '🪃',
+    icon: 'boomerang',
     maxLevel: 10,
     apply: (s) => {
       s.boomerangCount += 1;
@@ -179,7 +180,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'slowfield',
     name: '減速光環',
     desc: '身邊一圈的殭屍移動變慢；已有則擴大範圍',
-    emoji: '❄️',
+    icon: 'slowField',
     maxLevel: 5,
     apply: (s) => {
       s.slowRadius = s.slowRadius === 0 ? 7 : s.slowRadius + 1.5;
@@ -190,7 +191,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'timeslow',
     name: '時緩',
     desc: '全場殭屍永久減速 8%',
-    emoji: '🐌',
+    icon: 'timeSlow',
     maxLevel: 5,
     apply: (s) => (s.enemySpeedMul *= 0.92),
   },
@@ -198,7 +199,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'freeze',
     name: '冰凍彈',
     desc: '子彈命中有機率短暫冰凍殭屍；已有則機率提升',
-    emoji: '🧊',
+    icon: 'freeze',
     maxLevel: 5,
     apply: (s) => (s.freezeChance = Math.min(0.5, s.freezeChance + 0.08)),
   },
@@ -207,7 +208,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'lifesteal',
     name: '吸血',
     desc: '擊殺殭屍回復生命（每秒回血有上限）；已有則上限提升',
-    emoji: '🩸',
+    icon: 'lifesteal',
     maxLevel: 5,
     apply: (s) => (s.lifestealOnKill += 0.35),
   },
@@ -215,7 +216,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'regen',
     name: '生命再生',
     desc: '每秒回復生命；已有則回更多',
-    emoji: '❤️‍🩹',
+    icon: 'regen',
     maxLevel: 5,
     apply: (s) => (s.hpRegen += 0.7),
   },
@@ -223,7 +224,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'armor',
     name: '護甲',
     desc: '受到的傷害減免 10%（最多 70%）',
-    emoji: '🛡️',
+    icon: 'armor',
     maxLevel: 5,
     apply: (s) => (s.damageReduction = Math.min(0.7, s.damageReduction + 0.1)),
   },
@@ -231,7 +232,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'shield',
     name: '能量護盾',
     desc: '定期生成可擋一次傷害的護盾；已有則生成更快',
-    emoji: '🔆',
+    icon: 'shieldRegen',
     maxLevel: 5,
     apply: (s) => (s.shieldInterval = s.shieldInterval === 0 ? 12 : Math.max(4, s.shieldInterval - 2)),
   },
@@ -240,7 +241,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'crit',
     name: '暴擊',
     desc: '子彈有機率造成 2 倍傷害；已有則機率提升',
-    emoji: '💥',
+    icon: 'crit',
     maxLevel: 5,
     apply: (s) => (s.critChance = Math.min(0.6, s.critChance + 0.1)),
   },
@@ -248,7 +249,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'pierce',
     name: '穿透',
     desc: '子彈可貫穿 +1 隻殭屍不消失',
-    emoji: '🎯',
+    icon: 'pierce',
     maxLevel: 4,
     apply: (s) => (s.pierce += 1),
   },
@@ -256,7 +257,7 @@ export const UPGRADES: Upgrade[] = [
     id: 'explode',
     name: '爆裂彈',
     desc: '子彈命中產生範圍爆炸；已有則擴大並增傷',
-    emoji: '🧨',
+    icon: 'explode',
     maxLevel: 5,
     apply: (s) => {
       s.explodeRadius = s.explodeRadius === 0 ? 3 : s.explodeRadius + 0.8;

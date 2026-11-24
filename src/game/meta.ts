@@ -5,7 +5,8 @@ import { getCharacter } from './characters';
 export interface PermaUpgrade {
   id: string;
   name: string;
-  emoji: string;
+  /** lucide 圖示 key（見 ui/icons.ts） */
+  icon: string;
   desc: string;
   maxLevel: number;
   costBase: number;
@@ -13,11 +14,11 @@ export interface PermaUpgrade {
 }
 
 export const PERMA: PermaUpgrade[] = [
-  { id: 'might', name: '威力', emoji: '⚔️', desc: '起始傷害 +1／級', maxLevel: 5, costBase: 100, costStep: 80 },
-  { id: 'haste', name: '急速', emoji: '⚡', desc: '起始攻速 +6%／級', maxLevel: 5, costBase: 120, costStep: 90 },
-  { id: 'vigor', name: '活力', emoji: '❤️', desc: '起始生命 +20／級', maxLevel: 5, costBase: 100, costStep: 80 },
-  { id: 'swift', name: '敏捷', emoji: '👟', desc: '起始移速 +5%／級', maxLevel: 5, costBase: 100, costStep: 80 },
-  { id: 'greed', name: '貪婪', emoji: '💰', desc: '金幣獲得 +15%／級', maxLevel: 5, costBase: 150, costStep: 120 },
+  { id: 'might', name: '威力', icon: 'might', desc: '起始傷害 +1／級', maxLevel: 5, costBase: 100, costStep: 80 },
+  { id: 'haste', name: '急速', icon: 'haste', desc: '起始攻速 +6%／級', maxLevel: 5, costBase: 120, costStep: 90 },
+  { id: 'vigor', name: '活力', icon: 'vigor', desc: '起始生命 +20／級', maxLevel: 5, costBase: 100, costStep: 80 },
+  { id: 'swift', name: '敏捷', icon: 'swift', desc: '起始移速 +5%／級', maxLevel: 5, costBase: 100, costStep: 80 },
+  { id: 'greed', name: '貪婪', icon: 'greed', desc: '金幣獲得 +15%／級', maxLevel: 5, costBase: 150, costStep: 120 },
 ];
 
 export function permaCost(p: PermaUpgrade, currentLevel: number): number {

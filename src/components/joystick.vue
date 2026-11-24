@@ -8,7 +8,7 @@
     @pointerup="onUp"
     @pointercancel="onUp"
   >
-    <div ref="padRef" class="pad rounded-full bg-white/15 backdrop-blur-md">
+    <div ref="padRef" class="pad rounded-full bg-surface-2">
       <div class="thumb" :style="thumbStyle" />
     </div>
   </div>
