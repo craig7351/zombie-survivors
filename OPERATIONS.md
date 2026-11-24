@@ -120,9 +120,11 @@ cd ~/.openclaw/workspace/chiaqian/zombie-survivors
 
 ⚠️ **正式分享請用 `animal-survivors-9r7.pages.dev`** —— 快速隧道網址不固定、重開機就沒了。
 
-★ 這支腳本目前**未做憑證隔離**（會繼承 OpenClaw supervisor 注入的環境變數）。
-憑證只在 environ、不在 argv，屬 Unix 常態、優先級不高；但若要收斂，
-做法與「夢迴三國工作坊」的 `serve.sh` 相同：用 `env -i` 只帶 `HOME`／`PATH`／`TMPDIR` 等必要變數啟動。
+★ 這支腳本已做**憑證隔離**（commit `f0e248e`）：用 `env -i` 只帶 `HOME`／`PATH`／`TMPDIR` 等必要變數啟動
+wrangler 與 cloudflared，避免 OpenClaw supervisor 注入的受管憑證進到子行程的 environ。
+寫法與「夢迴三國工作坊」的 `serve.sh` 相同。
+
+★ 驗收時務必**先做正向對照校準**（不同工具對 environ 的可見性不一致，詳見 §9）。
 
 ---
 
@@ -169,6 +171,47 @@ git rev-list --left-right --count fork/main...main   # 應為 0  0
 3. **本機 wrangler 不在 PATH** —— 依賴 `~/.hermes/node/bin/`；該 node 環境重裝會讓 `npx --no-install` 失效（已有後援）。
 4. **`wrangler d1 list` 的 `num_tables` 不可信** —— 永遠顯示 0，要用 `d1 execute --remote --command "SELECT ..."` 實查。
 5. **SPA fallback 假象** —— 任意不存在的路徑都回 200 + HTML，驗收 API 要看 `content-type`。
+6. **稽核工具不穩** —— 「哪個 `ps` 變體看得到 environ」在不同機器／時段會顛倒，
+   必須先起一支帶假 key 的測試行程做正向對照，再採信結果。
+
+---
+
+## 9. 憑證稽核：務必正向對照校準
+
+**機制（已實測定案）**：憑證在 **environ**，不在 argv。
+`env KEY=VALUE cmd` 是把 key 加進環境變數再 exec `cmd`，argv 裡只有 `cmd` 與參數。
+好處：憑證不進 shell history、不出現在 process list 的 command 欄位。
+
+**但「哪個工具看得到 environ」不穩** —— 同一台機、同一個已知帶憑證的行程：
+
+| 工具 | 倩兒實測 | 小關實測 |
+|---|---|---|
+| `ps -Ao pid,command` | 0 | 看得到 |
+| `ps -eww -o args=` | 0 | 看得到 |
+| `ps -E -o command=` | **13** | 看不到 |
+| `ps -Eww -o command=` | **13** | 看不到 |
+| `pgrep -fl` | 0 | 看不到 |
+
+**兩次結果剛好相反。** 所以通則是：**任何單一 `ps` 變體都不能當稽核工具。**
+
+**唯一可靠做法 —— 先正向對照校準**：
+
+```bash
+# 1) 故意洩漏一支測試行程
+env OPENCLAW_TEST_LEAK=abc123secret sleep 120 &
+PROBE=$!
+
+# 2) 用你打算採信的變體去抓 —— 抓不到 = 這個變體在此環境無效，換一個
+for p in $PROBE; do
+  echo "pid $p -> $(ps -Eww -p $p -o command= 2>/dev/null | tr ' ' '\n' | grep -cE 'OPENCLAW_TEST_LEAK=') 個命中"
+done
+```
+
+★ 抓得到 → 這個變體有效，它回 0 才可信；抓不到 → 換工具。
+★ **不要用「掃不到」推論「沒曝露」。** 沒有校準過的掃描結果，等於沒掃。
+★ 底層讀法（最不受 `ps` 實作差異影響）：`KERN_PROCARGS2`，
+  用 `libc.sysctl`（不是 `sysctlbyname`）＋ `mib = (ctypes.c_int*3)(1, 49, pid)`；
+  **argv 起點是 `parts[1]`**（`parts[0]` 是 exec_path），從 `parts[:argc]` 起算會整組錯位一格。
 
 ---
 
